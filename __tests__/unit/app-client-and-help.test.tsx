@@ -57,13 +57,17 @@ vi.mock("@itsjust/core", () => ({
   ),
   useTool: () => ({
     state: {
-      data: { text: "Hello" },
+      data: {
+        svgContent: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"></svg>',
+        zoom: 1,
+        viewBox: "0 0 800 600",
+      },
       setData: mockSetData,
       isDirty: false,
       lastSaved: "just now",
     },
     toast: mockToast,
-    supportedFormats: ["json"],
+    supportedFormats: ["json", "svg"],
     handleExport: mockHandleExport,
     importFromFile: mockImport,
     isImporting: false,
@@ -73,20 +77,33 @@ vi.mock("@itsjust/core", () => ({
 
 vi.mock("@/tool", () => ({
   toolConfig: {
-    id: "simple-notepad",
-    name: "Notepad",
+    id: "svg-editor",
+    name: "SVG Editor",
     version: "1.0.0",
     features: { sidebar: true },
-    theme: { brand: "Notepad" },
+    theme: { brand: "SVG Editor" },
   },
-  templateBaseVersion: "1.1.0",
-  notepadTool: {
+  templateBaseVersion: "1.4.0",
+  svgEditorTool: {
     serialize: (state: unknown) => JSON.stringify(state),
-    deserialize: () => ({ success: true, data: { text: "From Shared Url" } }),
+    deserialize: () => ({
+      success: true,
+      data: {
+        svgContent: '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+        zoom: 1,
+        viewBox: "0 0 800 600",
+      },
+    }),
   },
-  ToolCanvas: ({ text }: { text: string }) => <div>canvas:{text}</div>,
+  ToolCanvas: ({ svgContent }: { svgContent: string }) => (
+    <div>canvas:{svgContent?.substring(0, 40)}...</div>
+  ),
   ToolToolbar: () => <div>toolbar</div>,
-  ToolSidebar: ({ text }: { text: string }) => <div>sidebar:{text}</div>,
+  ToolSidebar: ({
+    svgContent,
+  }: {
+    svgContent: string;
+  }) => <div>sidebar:{svgContent?.substring(0, 20)}...</div>,
 }));
 
 describe("app client and help page", () => {
