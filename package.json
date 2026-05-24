@@ -1,10 +1,7 @@
 {
-  "name": "template",
+  "name": "svg-editor",
   "version": "1.4.0",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "workspaces": [
     "packages/*"
   ],
