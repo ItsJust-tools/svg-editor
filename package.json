@@ -5,6 +5,9 @@
   "workspaces": [
     "packages/*"
   ],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "npm run build -w @itsjust/core && next build",
