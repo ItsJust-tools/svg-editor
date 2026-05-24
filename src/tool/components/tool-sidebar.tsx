@@ -1,52 +1,32 @@
 "use client";
 
 interface ToolSidebarProps {
-  text: string;
+  svgContent: string;
   fontSize?: number;
   onFontSizeChange?: (delta: number) => void;
 }
 
-function countWords(text: string): number {
-  const trimmed = text.trim();
-  if (!trimmed) return 0;
-  return trimmed.split(/\s+/).length;
-}
-
-function countChars(text: string): number {
-  return text.length;
-}
-
-function countLines(text: string): number {
-  if (!text) return 0;
-  return text.split("\n").length;
-}
-
 export function ToolSidebar({
-  text,
+  svgContent,
   fontSize,
   onFontSizeChange,
 }: ToolSidebarProps) {
-  const words = countWords(text);
-  const chars = countChars(text);
-  const lines = countLines(text);
-  const charsNoSpaces = text.replace(/\s/g, "").length;
+  const elements = (svgContent.match(/<\w+/g) || []).length;
+  const chars = svgContent.length;
+  const lines = svgContent.split("\n").length;
 
   return (
     <div className="notepad-sidebar">
       <div className="sidebar-section">
-        <h3>Document Stats</h3>
+        <h3>SVG Stats</h3>
         <dl className="stats-list">
           <div className="stat-row">
-            <dt>Words</dt>
-            <dd>{words.toLocaleString()}</dd>
+            <dt>Elements</dt>
+            <dd>{elements.toLocaleString()}</dd>
           </div>
           <div className="stat-row">
             <dt>Characters</dt>
             <dd>{chars.toLocaleString()}</dd>
-          </div>
-          <div className="stat-row">
-            <dt>Characters (no spaces)</dt>
-            <dd>{charsNoSpaces.toLocaleString()}</dd>
           </div>
           <div className="stat-row">
             <dt>Lines</dt>

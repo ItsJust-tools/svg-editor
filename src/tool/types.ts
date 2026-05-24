@@ -1,4 +1,6 @@
-export interface NotepadState {
-  text: string;
-  title?: string;
+export interface SvgEditorState {
+  svgContent: string;
+  selectedElementId?: string;
+  zoom: number;
+  viewBox: string;
 }

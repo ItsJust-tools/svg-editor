@@ -9,7 +9,7 @@ import {
 import {
   toolConfig,
   templateBaseVersion,
-  notepadTool,
+  svgEditorTool,
   ToolCanvas,
   ToolToolbar,
   ToolSidebar,
@@ -21,7 +21,7 @@ const MAX_FONT_SIZE = 72;
 
 export default function ToolClient() {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const tool = useTool(notepadTool, canvasRef);
+  const tool = useTool(svgEditorTool, canvasRef);
   const setToolData = tool.state.setData;
   const showToast = tool.toast;
   const [isSharing, setIsSharing] = useState(false);
@@ -34,7 +34,7 @@ export default function ToolClient() {
   );
   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
 
-  const title = tool.state.data.title?.trim() || toolConfig.name;
+  const title = toolConfig.name;
   const [isEditingBrand, setIsEditingBrand] = useState(false);
   const [editValue, setEditValue] = useState(title);
 
@@ -44,14 +44,14 @@ export default function ToolClient() {
 
   const handleTextChange = useCallback(
     (text: string) => {
-      setToolData((prev) => ({ ...prev, text }));
+      setToolData((prev) => ({ ...prev, svgContent: text }));
     },
     [setToolData],
   );
 
   const handleFontSizeChange = useCallback((delta: number) => {
     setFontSize((prev) =>
-      Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, prev + delta)),
+      Math.max(MIN_FONT_SIZE, Math.max(MAX_FONT_SIZE, prev + delta)),
     );
   }, []);
 
@@ -65,7 +65,7 @@ export default function ToolClient() {
       const serialized = decompressFromEncodedURIComponent(encodedState);
       if (!serialized) throw new Error("Invalid shared URL");
       const parsed: unknown = JSON.parse(serialized);
-      const deserialized = notepadTool.deserialize(parsed);
+      const deserialized = svgEditorTool.deserialize(parsed);
       if (!deserialized.success) throw new Error(deserialized.error);
       setToolData(deserialized.data);
       showToast("Loaded state from shared URL", "success");
@@ -79,7 +79,7 @@ export default function ToolClient() {
   const handleShare = useCallback(async () => {
     setIsSharing(true);
     try {
-      const serialized = notepadTool.serialize(tool.state.data);
+      const serialized = svgEditorTool.serialize(tool.state.data);
       const encodedState = compressToEncodedURIComponent(serialized);
       if (!encodedState) throw new Error("Failed to encode state for URL");
       const url = new URL(window.location.href);
@@ -119,8 +119,6 @@ export default function ToolClient() {
       brandValue: isEditingBrand ? editValue : title,
       onBrandChange: (value: string) => setEditValue(value),
       onBrandCommit: () => {
-        const trimmed = editValue.trim();
-        setToolData((prev) => ({ ...prev, title: trimmed || undefined }));
         setIsEditingBrand(false);
       },
       onBrandCancel: () => {
@@ -147,8 +145,7 @@ export default function ToolClient() {
 
   const sidebarContent = (
     <ToolSidebar
-      text={tool.state.data.text}
-      fontSize={fontSize}
+      svgContent={tool.state.data.svgContent}
       onFontSizeChange={handleFontSizeChange}
     />
   );
@@ -156,7 +153,7 @@ export default function ToolClient() {
   const canvasContent = (
     <ToolCanvas
       canvasRef={canvasRef}
-      text={tool.state.data.text}
+      text={tool.state.data.svgContent}
       fontSize={fontSize}
       onChange={handleTextChange}
     />

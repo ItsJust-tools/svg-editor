@@ -4,7 +4,7 @@ const DEFAULT_DEV_URL = "http://localhost:3000";
 
 export const templateMetadata = {
   htmlLang: "en",
-  locale: "en_US",
+  locale: "en",
   appName: toolConfig.name,
   shortName: toolConfig.name,
   appDescription: toolConfig.description,

@@ -4,11 +4,11 @@
 
 A Next.js template for building specialized single-purpose web tools. Each tool does ONE thing well — no bloat, no signups, no confusing menus.
 
-**Live example:** [itsjust.tools](https://itsjust.tools)
+**Live example:** [svg-editor.itsjust.tools](https://svg-editor.itsjust.tools)
 
 ## Why?
 
-Multi-purpose tools (UML generators, diagram apps, paint programs) are bloated and confusing. itsjust tools do one thing and do it well. Want a UML activity diagram maker? It makes UML activity diagrams. Nothing else. Want a pixel art editor? It edits pixels. Clean, focused, fast.
+Multi-purpose tools (UML generators, diagram apps, paint programs) are bloated and confusing. itsjust tools do one thing and do it well. The SVG Editor edits SVGs — nothing else. Clean, focused, fast.
 
 ## Compatibility
 
@@ -379,7 +379,7 @@ Before tagging a release, verify:
 - [ ] Version bumped in `package.json`
 - [ ] SEO metadata verified (title, description, OG image, canonical)
 - [ ] PWA manifest points to correct name and icons
-- [ ] No hardcoded `itsjust.tools` references remain (except intentional)
+- [x] No hardcoded `itsjust.tools` references remain (except intentional)
 - [ ] README quick-start commands work on a fresh clone
 
 ## Definition of Done

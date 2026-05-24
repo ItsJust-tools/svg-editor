@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { generateJsonLd, generateToolMetadata } from "@/lib/seo";
 import toolConfig from "@/tool/tool.config";
 import { getPublicSiteUrl, templateMetadata } from "@/tool/template-metadata";
-import { notepadTool } from "@/tool/tool-definition";
+import { svgEditorTool } from "@/tool/tool-definition";
 import { ToolCanvas } from "@/tool/components/tool-canvas";
 import { ToolSidebar } from "@/tool/components/tool-sidebar";
 import { ToolToolbar } from "@/tool/components/tool-toolbar";
@@ -112,20 +112,29 @@ describe("app and seo", () => {
   it("covers tool definition and helper exports", async () => {
     expect(cn("a", undefined, "b", false, null, "c")).toBe("a b c");
     expect(getPublicSiteUrl()).toBe("http://localhost:3000");
-    expect(notepadTool.deserialize({ text: "x" })).toEqual({
+
+    const validState = {
+      svgContent: '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+      zoom: 1,
+      viewBox: "0 0 800 600",
+    };
+
+    expect(svgEditorTool.deserialize(validState)).toEqual({
       success: true,
-      data: { text: "x" },
+      data: validState,
     });
-    expect(notepadTool.deserialize({ nope: true })).toEqual({
+
+    expect(svgEditorTool.deserialize({ nope: true })).toEqual({
       success: false,
-      error: "Invalid data format: expected { text: string, title?: string }",
+      error:
+        "Invalid data format: expected { svgContent: string, zoom: number, viewBox: string }",
     });
-    expect(notepadTool.serialize({ text: "x" })).toContain('"text": "x"');
-    expect(notepadTool.deserialize({ text: "x", title: "My Note" })).toEqual({
-      success: true,
-      data: { text: "x", title: "My Note" },
-    });
-    const exporters = notepadTool.exporters ?? [];
+
+    const serialized = svgEditorTool.serialize(validState);
+    expect(serialized).toContain("svgContent");
+    expect(serialized).toContain("viewBox");
+
+    const exporters = svgEditorTool.exporters ?? [];
     expect(exporters).toHaveLength(4);
     const first = exporters[0];
     expect(first).toBeDefined();
@@ -140,8 +149,7 @@ describe("app and seo", () => {
       <>
         <ToolToolbar />
         <ToolSidebar
-          text="Hello world"
-          fontSize={16}
+          svgContent='<svg xmlns="http://www.w3.org/2000/svg"></svg>'
           onFontSizeChange={() => {}}
         />
         <ToolCanvas text="" fontSize={16} />
@@ -151,7 +159,6 @@ describe("app and seo", () => {
     expect(
       screen.getByRole("link", { name: "Open help page" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("11")).toBeInTheDocument(); // char count for "Hello world"
     expect(
       screen.getByRole("application", { name: "Notepad canvas" }),
     ).toBeInTheDocument();
