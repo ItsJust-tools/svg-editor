@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface ToolSidebarProps {
   text: string;
@@ -18,14 +18,18 @@ function countChars(text: string): number {
 
 function countLines(text: string): number {
   if (!text) return 0;
-  return text.split('\n').length;
+  return text.split("\n").length;
 }
 
-export function ToolSidebar({ text, fontSize, onFontSizeChange }: ToolSidebarProps) {
+export function ToolSidebar({
+  text,
+  fontSize,
+  onFontSizeChange,
+}: ToolSidebarProps) {
   const words = countWords(text);
   const chars = countChars(text);
   const lines = countLines(text);
-  const charsNoSpaces = text.replace(/\s/g, '').length;
+  const charsNoSpaces = text.replace(/\s/g, "").length;
 
   return (
     <div className="notepad-sidebar">

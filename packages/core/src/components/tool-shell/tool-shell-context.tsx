@@ -1,5 +1,5 @@
-import { createContext, useContext } from 'react';
-import type { ExportFormat, ToolConfig } from '../../types';
+import { createContext, useContext } from "react";
+import type { ExportFormat, ToolConfig } from "../../types";
 
 export interface ToolbarActions {
   /** Undo the latest state change. */
@@ -47,6 +47,9 @@ export const ShellContext = createContext<ShellContextValue | null>(null);
 
 export function useShell() {
   const ctx = useContext(ShellContext);
-  if (!ctx) throw new Error('ToolShell compound components must be used within ToolShell');
+  if (!ctx)
+    throw new Error(
+      "ToolShell compound components must be used within ToolShell",
+    );
   return ctx;
 }

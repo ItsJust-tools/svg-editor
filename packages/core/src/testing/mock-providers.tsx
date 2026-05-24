@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { ThemeProvider } from '../components/theme-provider/theme-provider';
+import React from "react";
+import { ThemeProvider } from "../components/theme-provider/theme-provider";
 
 export function MockThemeProvider({
-  theme = 'light',
+  theme = "light",
   children,
 }: {
-  theme?: 'light' | 'dark';
+  theme?: "light" | "dark";
   children: React.ReactNode;
 }) {
   return (
@@ -22,7 +22,7 @@ export function MockToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function MockIntlProvider({
-  locale = 'en',
+  locale = "en",
   messages = {},
   children,
 }: {

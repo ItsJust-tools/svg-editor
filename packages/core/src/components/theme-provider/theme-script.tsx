@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import type { ToolTheme } from '../../types';
+import type { ToolTheme } from "../../types";
 
 export function ThemeScript({ toolTheme }: { toolTheme?: ToolTheme }) {
   const themeScript = `
@@ -37,7 +37,11 @@ export function ThemeScript({ toolTheme }: { toolTheme?: ToolTheme }) {
       if (t.accentSubtle) r.style.setProperty('--accent-subtle', t.accentSubtle);
     })();
   `
-    : '';
+    : "";
 
-  return <script dangerouslySetInnerHTML={{ __html: themeScript + toolThemeScript }} />;
+  return (
+    <script
+      dangerouslySetInnerHTML={{ __html: themeScript + toolThemeScript }}
+    />
+  );
 }

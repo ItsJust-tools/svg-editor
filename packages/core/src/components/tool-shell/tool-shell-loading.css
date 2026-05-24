@@ -12,7 +12,7 @@
 
 .toolbar-skeleton::before,
 .toolbar-skeleton::after {
-  content: '';
+  content: "";
   height: 28px;
   border-radius: var(--radius);
   background: var(--muted-bg);
@@ -45,7 +45,7 @@
   animation: shimmer 1.8s ease-in-out infinite;
 }
 
-[data-theme='dark'] .skeleton-pulse {
+[data-theme="dark"] .skeleton-pulse {
   background: linear-gradient(
     110deg,
     transparent 30%,
@@ -76,7 +76,7 @@
 
 .statusbar-skeleton::before,
 .statusbar-skeleton::after {
-  content: '';
+  content: "";
   height: 12px;
   border-radius: 3px;
   background: var(--muted-bg);

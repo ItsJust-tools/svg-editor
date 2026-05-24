@@ -1,9 +1,9 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
+import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: 'Page not found',
-  description: 'The page you are looking for does not exist.',
+  title: "Page not found",
+  description: "The page you are looking for does not exist.",
 };
 
 export default function NotFound() {
@@ -26,7 +26,9 @@ export default function NotFound() {
           </svg>
         </div>
         <h1>Page not found</h1>
-        <p>The page you are looking for doesn&apos;t exist or has been moved.</p>
+        <p>
+          The page you are looking for doesn&apos;t exist or has been moved.
+        </p>
         <Link href="/" className="error-btn-primary">
           Go home
         </Link>

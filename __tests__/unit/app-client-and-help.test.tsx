@@ -1,29 +1,48 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import type { ReactNode } from 'react';
-import ToolClient from '@/app/tool-client';
-import ToolClientWrapper from '@/app/tool-client-wrapper';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import type { ReactNode } from "react";
+import ToolClient from "@/app/tool-client";
+import ToolClientWrapper from "@/app/tool-client-wrapper";
 
-vi.mock('next/link', () => ({
-  default: ({ href, children, ...props }: { href: string; children: ReactNode }) => (
+vi.mock("next/link", () => ({
+  default: ({
+    href,
+    children,
+    ...props
+  }: {
+    href: string;
+    children: ReactNode;
+  }) => (
     <a href={href} {...props}>
       {children}
     </a>
   ),
 }));
 
-vi.mock('next/dynamic', () => ({
-  default: () => () => <div data-testid="dynamic-tool-client">dynamic-tool-client</div>,
+vi.mock("next/dynamic", () => ({
+  default: () => () => (
+    <div data-testid="dynamic-tool-client">dynamic-tool-client</div>
+  ),
 }));
 
 const mockSetData = vi.fn();
 const mockToast = vi.fn();
 const mockHandleExport = vi.fn();
 const mockImport = vi.fn();
-const mockToolbarActions = { canUndo: true, canRedo: true, onUndo: vi.fn(), onRedo: vi.fn() };
+const mockToolbarActions = {
+  canUndo: true,
+  canRedo: true,
+  onUndo: vi.fn(),
+  onRedo: vi.fn(),
+};
 
-vi.mock('@itsjust/core', () => ({
-  ToolShell: ({ toolbar, sidebar, canvas, statusBar }: Record<string, unknown>) => (
+vi.mock("@itsjust/core", () => ({
+  ToolShell: ({
+    toolbar,
+    sidebar,
+    canvas,
+    statusBar,
+  }: Record<string, unknown>) => (
     <div>
       <div>{toolbar as ReactNode}</div>
       <div>{sidebar as ReactNode}</div>
@@ -38,13 +57,13 @@ vi.mock('@itsjust/core', () => ({
   ),
   useTool: () => ({
     state: {
-      data: { text: 'Hello' },
+      data: { text: "Hello" },
       setData: mockSetData,
       isDirty: false,
-      lastSaved: 'just now',
+      lastSaved: "just now",
     },
     toast: mockToast,
-    supportedFormats: ['json'],
+    supportedFormats: ["json"],
     handleExport: mockHandleExport,
     importFromFile: mockImport,
     isImporting: false,
@@ -52,49 +71,53 @@ vi.mock('@itsjust/core', () => ({
   }),
 }));
 
-vi.mock('@/tool', () => ({
+vi.mock("@/tool", () => ({
   toolConfig: {
-    id: 'simple-notepad',
-    name: 'Notepad',
-    version: '1.0.0',
+    id: "simple-notepad",
+    name: "Notepad",
+    version: "1.0.0",
     features: { sidebar: true },
-    theme: { brand: 'Notepad' },
+    theme: { brand: "Notepad" },
   },
-  templateBaseVersion: '1.1.0',
+  templateBaseVersion: "1.1.0",
   notepadTool: {
     serialize: (state: unknown) => JSON.stringify(state),
-    deserialize: () => ({ success: true, data: { text: 'From Shared Url' } }),
+    deserialize: () => ({ success: true, data: { text: "From Shared Url" } }),
   },
   ToolCanvas: ({ text }: { text: string }) => <div>canvas:{text}</div>,
   ToolToolbar: () => <div>toolbar</div>,
   ToolSidebar: ({ text }: { text: string }) => <div>sidebar:{text}</div>,
 }));
 
-describe('app client and help page', () => {
+describe("app client and help page", () => {
   beforeEach(() => {
     mockSetData.mockReset();
     mockToast.mockReset();
-    Object.defineProperty(navigator, 'clipboard', {
+    Object.defineProperty(navigator, "clipboard", {
       writable: true,
       value: { writeText: vi.fn().mockResolvedValue(undefined) },
     });
-    Object.defineProperty(navigator, 'share', {
+    Object.defineProperty(navigator, "share", {
       writable: true,
       value: vi.fn().mockResolvedValue(undefined),
     });
-    window.history.replaceState(null, '', 'http://localhost:3000/?state=e30%3D');
+    window.history.replaceState(
+      null,
+      "",
+      "http://localhost:3000/?state=e30%3D",
+    );
   });
 
-  it('renders dynamic tool client wrapper', () => {
+  it("renders dynamic tool client wrapper", () => {
     render(<ToolClientWrapper />);
-    expect(screen.getByTestId('dynamic-tool-client')).toBeInTheDocument();
+    expect(screen.getByTestId("dynamic-tool-client")).toBeInTheDocument();
   });
 
-  it('handles share flow in tool client', async () => {
+  it("handles share flow in tool client", async () => {
     render(<ToolClient />);
 
-    expect(screen.getByText('toolbar')).toBeInTheDocument();
-    fireEvent.click(screen.getByText('trigger-share'));
+    expect(screen.getByText("toolbar")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("trigger-share"));
 
     expect(mockToast).toHaveBeenCalled();
   });

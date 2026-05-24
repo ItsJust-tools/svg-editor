@@ -1,14 +1,14 @@
-import React from 'react';
-import { render, type RenderOptions } from '@testing-library/react';
-import { MockThemeProvider, MockToastProvider } from './mock-providers';
-import type { ToolConfig } from '../types';
+import React from "react";
+import { render, type RenderOptions } from "@testing-library/react";
+import { MockThemeProvider, MockToastProvider } from "./mock-providers";
+import type { ToolConfig } from "../types";
 
 const testConfig: ToolConfig = {
-  id: 'test-tool',
-  name: 'Test Tool',
-  description: 'A test tool',
-  version: '0.0.0',
-  exportFormats: ['json'],
+  id: "test-tool",
+  name: "Test Tool",
+  description: "A test tool",
+  version: "0.0.0",
+  exportFormats: ["json"],
   features: {
     export: true,
     autoSave: false,
@@ -19,7 +19,10 @@ const testConfig: ToolConfig = {
   },
 };
 
-export function renderTool(ui: React.ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
+export function renderTool(
+  ui: React.ReactElement,
+  options?: Omit<RenderOptions, "wrapper">,
+) {
   return render(ui, {
     wrapper: ({ children }) => (
       <MockThemeProvider theme="light">
@@ -30,8 +33,10 @@ export function renderTool(ui: React.ReactElement, options?: Omit<RenderOptions,
   });
 }
 
-function isFunctionUpdater<T>(value: T | ((prev: T) => T)): value is (prev: T) => T {
-  return typeof value === 'function';
+function isFunctionUpdater<T>(
+  value: T | ((prev: T) => T),
+): value is (prev: T) => T {
+  return typeof value === "function";
 }
 
 export interface MockToolState<T> {

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   createContext,
@@ -8,24 +8,24 @@ import {
   useRef,
   useEffect,
   type ReactNode,
-} from 'react';
-import { t as tt } from '../../i18n/strings';
+} from "react";
+import { t as tt } from "../../i18n/strings";
 
 interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error' | 'info';
+  type: "success" | "error" | "info";
   exiting?: boolean;
 }
 
 interface ToastContextValue {
-  toast: (message: string, type?: Toast['type']) => void;
+  toast: (message: string, type?: Toast["type"]) => void;
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
-function ToastIcon({ type }: { type: Toast['type'] }) {
-  if (type === 'success') {
+function ToastIcon({ type }: { type: Toast["type"] }) {
+  if (type === "success") {
     return (
       <svg
         width="16"
@@ -41,7 +41,7 @@ function ToastIcon({ type }: { type: Toast['type'] }) {
       </svg>
     );
   }
-  if (type === 'error') {
+  if (type === "error") {
     return (
       <svg
         width="16"
@@ -77,7 +77,7 @@ function ToastIcon({ type }: { type: Toast['type'] }) {
 
 export function useToast() {
   const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error('useToast must be used within ToastProvider');
+  if (!ctx) throw new Error("useToast must be used within ToastProvider");
   return ctx;
 }
 
@@ -94,25 +94,32 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const addToast = useCallback((message: string, type: Toast['type'] = 'info') => {
-    const id = nextIdRef.current++;
-    setToasts((prev) => [...prev, { id, message, type }]);
+  const addToast = useCallback(
+    (message: string, type: Toast["type"] = "info") => {
+      const id = nextIdRef.current++;
+      setToasts((prev) => [...prev, { id, message, type }]);
 
-    const t1 = setTimeout(() => {
-      setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, exiting: true } : t)));
-      timersRef.current.delete(t1);
-    }, 2700);
-    timersRef.current.add(t1);
+      const t1 = setTimeout(() => {
+        setToasts((prev) =>
+          prev.map((t) => (t.id === id ? { ...t, exiting: true } : t)),
+        );
+        timersRef.current.delete(t1);
+      }, 2700);
+      timersRef.current.add(t1);
 
-    const t2 = setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-      timersRef.current.delete(t2);
-    }, 3000);
-    timersRef.current.add(t2);
-  }, []);
+      const t2 = setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+        timersRef.current.delete(t2);
+      }, 3000);
+      timersRef.current.add(t2);
+    },
+    [],
+  );
 
   const dismissToast = useCallback((id: number) => {
-    setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, exiting: true } : t)));
+    setToasts((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, exiting: true } : t)),
+    );
   }, []);
 
   return (
@@ -122,8 +129,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`toast toast-${t.type} ${t.exiting ? 'toast-exit' : ''}`}
-            role={t.type === 'error' ? 'alert' : 'status'}
+            className={`toast toast-${t.type} ${t.exiting ? "toast-exit" : ""}`}
+            role={t.type === "error" ? "alert" : "status"}
             onAnimationEnd={() => {
               if (t.exiting) {
                 setToasts((prev) => prev.filter((x) => x.id !== t.id));
@@ -136,7 +143,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               type="button"
               className="toast-dismiss"
               onClick={() => dismissToast(t.id)}
-              aria-label={tt('dismissNotification')}
+              aria-label={tt("dismissNotification")}
             >
               ×
             </button>
@@ -147,4 +154,4 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     </ToastContext.Provider>
   );
 }
-ToastProvider.displayName = 'ToastProvider';
+ToastProvider.displayName = "ToastProvider";

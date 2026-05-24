@@ -1,8 +1,11 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ToolShell, useTool, ImportExport } from '@itsjust/core';
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ToolShell, useTool, ImportExport } from "@itsjust/core";
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string";
 import {
   toolConfig,
   templateBaseVersion,
@@ -10,7 +13,7 @@ import {
   ToolCanvas,
   ToolToolbar,
   ToolSidebar,
-} from '@/tool';
+} from "@/tool";
 
 const DEFAULT_FONT_SIZE = 16;
 const MIN_FONT_SIZE = 8;
@@ -24,7 +27,10 @@ export default function ToolClient() {
   const [isSharing, setIsSharing] = useState(false);
   const hasLoadedSharedState = useRef(false);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(
-    () => typeof window !== 'undefined' && window.innerWidth > 768 && toolConfig.features.sidebar
+    () =>
+      typeof window !== "undefined" &&
+      window.innerWidth > 768 &&
+      toolConfig.features.sidebar,
   );
   const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
 
@@ -40,30 +46,33 @@ export default function ToolClient() {
     (text: string) => {
       setToolData((prev) => ({ ...prev, text }));
     },
-    [setToolData]
+    [setToolData],
   );
 
   const handleFontSizeChange = useCallback((delta: number) => {
-    setFontSize((prev) => Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, prev + delta)));
+    setFontSize((prev) =>
+      Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, prev + delta)),
+    );
   }, []);
 
   useEffect(() => {
     if (hasLoadedSharedState.current) return;
     hasLoadedSharedState.current = true;
     const params = new URLSearchParams(window.location.search);
-    const encodedState = params.get('state');
+    const encodedState = params.get("state");
     if (!encodedState) return;
     try {
       const serialized = decompressFromEncodedURIComponent(encodedState);
-      if (!serialized) throw new Error('Invalid shared URL');
+      if (!serialized) throw new Error("Invalid shared URL");
       const parsed: unknown = JSON.parse(serialized);
       const deserialized = notepadTool.deserialize(parsed);
       if (!deserialized.success) throw new Error(deserialized.error);
       setToolData(deserialized.data);
-      showToast('Loaded state from shared URL', 'success');
+      showToast("Loaded state from shared URL", "success");
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to load shared URL';
-      showToast(message, 'error');
+      const message =
+        error instanceof Error ? error.message : "Failed to load shared URL";
+      showToast(message, "error");
     }
   }, [setToolData, showToast]);
 
@@ -72,27 +81,28 @@ export default function ToolClient() {
     try {
       const serialized = notepadTool.serialize(tool.state.data);
       const encodedState = compressToEncodedURIComponent(serialized);
-      if (!encodedState) throw new Error('Failed to encode state for URL');
+      if (!encodedState) throw new Error("Failed to encode state for URL");
       const url = new URL(window.location.href);
-      url.searchParams.set('state', encodedState);
-      url.searchParams.set('tool', toolConfig.id);
-      window.history.replaceState(null, '', url.toString());
+      url.searchParams.set("state", encodedState);
+      url.searchParams.set("tool", toolConfig.id);
+      window.history.replaceState(null, "", url.toString());
 
       const shareUrl = url.toString();
       if (navigator.share) {
         try {
           await navigator.share({ title, url: shareUrl });
-          showToast('Shared URL ready', 'success');
+          showToast("Shared URL ready", "success");
           return;
         } catch (error) {
-          if (error instanceof Error && error.name === 'AbortError') return;
+          if (error instanceof Error && error.name === "AbortError") return;
         }
       }
       await navigator.clipboard.writeText(shareUrl);
-      showToast('Share URL copied to clipboard', 'success');
+      showToast("Share URL copied to clipboard", "success");
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to create share URL';
-      showToast(message, 'error');
+      const message =
+        error instanceof Error ? error.message : "Failed to create share URL";
+      showToast(message, "error");
     } finally {
       setIsSharing(false);
     }
@@ -118,7 +128,7 @@ export default function ToolClient() {
         setIsEditingBrand(false);
       },
     }),
-    [tool.toolbarActions, isEditingBrand, editValue, title, setToolData]
+    [tool.toolbarActions, isEditingBrand, editValue, title, setToolData],
   );
 
   const toolbarContent = (
@@ -155,7 +165,7 @@ export default function ToolClient() {
   const statusBarContent = (
     <>
       <span
-        className={`status-slot status-slot-state ${tool.state.isDirty ? 'status-unsaved' : 'status-saved'}`}
+        className={`status-slot status-slot-state ${tool.state.isDirty ? "status-unsaved" : "status-saved"}`}
       >
         {tool.state.isDirty ? (
           <>
@@ -165,11 +175,13 @@ export default function ToolClient() {
         ) : tool.state.lastSaved ? (
           <>Saved {tool.state.lastSaved}</>
         ) : (
-          'Ready'
+          "Ready"
         )}
       </span>
       <span className="status-slot status-slot-font-size">{fontSize}px</span>
-      <span className="status-slot status-slot-tool-version">Tool v{toolConfig.version}</span>
+      <span className="status-slot status-slot-tool-version">
+        Tool v{toolConfig.version}
+      </span>
       <span className="status-slot status-slot-template-version">
         Template v{templateBaseVersion}
       </span>

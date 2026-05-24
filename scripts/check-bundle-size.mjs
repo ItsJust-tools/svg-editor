@@ -1,18 +1,22 @@
-import { readdirSync, statSync } from 'fs';
-import { join } from 'path';
+import { readdirSync, statSync } from "fs";
+import { join } from "path";
 
-const CHUNKS_DIR = '.next/static/chunks';
+const CHUNKS_DIR = ".next/static/chunks";
 
 const BUDGETS = [
-  { pattern: /^main-.*\.js$/, maxBytes: 200 * 1024, name: 'main chunk' },
-  { pattern: /^framework-.*\.js$/, maxBytes: 150 * 1024, name: 'framework chunk' },
-  { pattern: /^.*\.js$/, maxBytes: 500 * 1024, name: 'any single chunk' },
+  { pattern: /^main-.*\.js$/, maxBytes: 200 * 1024, name: "main chunk" },
+  {
+    pattern: /^framework-.*\.js$/,
+    maxBytes: 150 * 1024,
+    name: "framework chunk",
+  },
+  { pattern: /^.*\.js$/, maxBytes: 500 * 1024, name: "any single chunk" },
 ];
 
 function check() {
-  const files = readdirSync(CHUNKS_DIR).filter((f) => f.endsWith('.js'));
+  const files = readdirSync(CHUNKS_DIR).filter((f) => f.endsWith(".js"));
   if (files.length === 0) {
-    console.warn('No JS chunks found — skipping bundle check.');
+    console.warn("No JS chunks found — skipping bundle check.");
     return 0;
   }
 
@@ -28,7 +32,7 @@ function check() {
     for (const budget of BUDGETS) {
       if (budget.pattern.test(file) && size > budget.maxBytes) {
         console.error(
-          `❌ Budget exceeded: ${file} (${(size / 1024).toFixed(1)}KB) > ${budget.name} limit (${(budget.maxBytes / 1024).toFixed(1)}KB)`
+          `❌ Budget exceeded: ${file} (${(size / 1024).toFixed(1)}KB) > ${budget.name} limit (${(budget.maxBytes / 1024).toFixed(1)}KB)`,
         );
         errors++;
       }

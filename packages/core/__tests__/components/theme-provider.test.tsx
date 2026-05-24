@@ -1,13 +1,13 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { ThemeProvider, useTheme } from '../../src/components/theme-provider';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { ThemeProvider, useTheme } from "../../src/components/theme-provider";
 
 function wrapper({ children }: { children: React.ReactNode }) {
   return <ThemeProvider>{children}</ThemeProvider>;
 }
 
 function mockMatchMedia(matches: boolean) {
-  Object.defineProperty(window, 'matchMedia', {
+  Object.defineProperty(window, "matchMedia", {
     writable: true,
     value: vi.fn().mockImplementation((query: string) => ({
       matches,
@@ -20,47 +20,47 @@ function mockMatchMedia(matches: boolean) {
   });
 }
 
-describe('ThemeProvider', () => {
+describe("ThemeProvider", () => {
   beforeEach(() => {
-    document.documentElement.removeAttribute('data-theme');
+    document.documentElement.removeAttribute("data-theme");
     mockMatchMedia(false);
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('provides default system theme', () => {
+  it("provides default system theme", () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
 
-    expect(result.current.theme).toBe('system');
-    expect(['light', 'dark']).toContain(result.current.resolvedTheme);
+    expect(result.current.theme).toBe("system");
+    expect(["light", "dark"]).toContain(result.current.resolvedTheme);
   });
 
-  it('changes theme', () => {
+  it("changes theme", () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
 
     act(() => {
-      result.current.setTheme('dark');
+      result.current.setTheme("dark");
     });
 
-    expect(result.current.theme).toBe('dark');
-    expect(result.current.resolvedTheme).toBe('dark');
-    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    expect(result.current.theme).toBe("dark");
+    expect(result.current.resolvedTheme).toBe("dark");
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
   });
 
-  it('toggles between light and dark', () => {
+  it("toggles between light and dark", () => {
     const { result } = renderHook(() => useTheme(), { wrapper });
 
     act(() => {
-      result.current.setTheme('light');
+      result.current.setTheme("light");
     });
-    expect(result.current.resolvedTheme).toBe('light');
+    expect(result.current.resolvedTheme).toBe("light");
 
     act(() => {
-      result.current.setTheme('dark');
+      result.current.setTheme("dark");
     });
-    expect(result.current.resolvedTheme).toBe('dark');
+    expect(result.current.resolvedTheme).toBe("dark");
   });
 });

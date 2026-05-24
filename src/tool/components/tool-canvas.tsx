@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useCallback } from 'react';
+import { useCallback } from "react";
 
 interface ToolCanvasProps {
   text: string;
@@ -21,11 +21,16 @@ export function ToolCanvas({
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       onChange?.(e.target.value);
     },
-    [onChange]
+    [onChange],
   );
 
   return (
-    <div ref={canvasRef} className="notepad-canvas" role="application" aria-label="Notepad canvas">
+    <div
+      ref={canvasRef}
+      className="notepad-canvas"
+      role="application"
+      aria-label="Notepad canvas"
+    >
       <textarea
         className="notepad-textarea"
         value={text}

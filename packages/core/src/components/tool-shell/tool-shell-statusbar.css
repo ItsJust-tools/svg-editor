@@ -86,8 +86,8 @@
   .tool-shell-statusbar {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
-      'state title'
-      'toolVersion templateVersion';
+      "state title"
+      "toolVersion templateVersion";
     row-gap: 0.375rem;
   }
 

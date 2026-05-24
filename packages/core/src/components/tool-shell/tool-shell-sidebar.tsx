@@ -1,9 +1,9 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { useShell } from './tool-shell-context';
-import { t } from '../../i18n/strings';
+import { useState, useCallback, useRef, useEffect } from "react";
+import type { ReactNode } from "react";
+import { useShell } from "./tool-shell-context";
+import { t } from "../../i18n/strings";
 
-const SIDEBAR_WIDTH_KEY = 'itsjust:sidebar-width';
+const SIDEBAR_WIDTH_KEY = "itsjust:sidebar-width";
 const MIN_SIDEBAR_WIDTH = 180;
 const MAX_SIDEBAR_WIDTH = 480;
 const DEFAULT_SIDEBAR_WIDTH = 240;
@@ -12,8 +12,8 @@ function getFocusableElements(container: HTMLElement | null): HTMLElement[] {
   if (!container) return [];
   return Array.from(
     container.querySelectorAll(
-      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
-    )
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])',
+    ),
   );
 }
 
@@ -21,12 +21,16 @@ export function Sidebar({ children }: { children?: ReactNode }) {
   const { config, sidebarOpen, toggleSidebar, isMobile } = useShell();
   const sidebarEnabled = config.features.sidebar;
   const [sidebarWidth, setSidebarWidth] = useState(() => {
-    if (typeof window === 'undefined') return DEFAULT_SIDEBAR_WIDTH;
+    if (typeof window === "undefined") return DEFAULT_SIDEBAR_WIDTH;
     try {
       const stored = localStorage.getItem(SIDEBAR_WIDTH_KEY);
       if (stored) {
         const width = parseInt(stored, 10);
-        if (!isNaN(width) && width >= MIN_SIDEBAR_WIDTH && width <= MAX_SIDEBAR_WIDTH) {
+        if (
+          !isNaN(width) &&
+          width >= MIN_SIDEBAR_WIDTH &&
+          width <= MAX_SIDEBAR_WIDTH
+        ) {
           return width;
         }
       }
@@ -44,31 +48,37 @@ export function Sidebar({ children }: { children?: ReactNode }) {
     e.preventDefault();
     isResizingRef.current = true;
     setIsResizing(true);
-    document.body.style.cursor = 'ew-resize';
-    document.body.style.userSelect = 'none';
+    document.body.style.cursor = "ew-resize";
+    document.body.style.userSelect = "none";
   }, []);
 
   useEffect(() => {
     function handleMouseMove(e: MouseEvent) {
       if (!isResizingRef.current) return;
-      const newWidth = Math.max(MIN_SIDEBAR_WIDTH, Math.min(MAX_SIDEBAR_WIDTH, e.clientX));
+      const newWidth = Math.max(
+        MIN_SIDEBAR_WIDTH,
+        Math.min(MAX_SIDEBAR_WIDTH, e.clientX),
+      );
       setSidebarWidth(newWidth);
     }
     function handleMouseUp() {
       if (!isResizingRef.current) return;
       isResizingRef.current = false;
       setIsResizing(false);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
       try {
-        localStorage.setItem(SIDEBAR_WIDTH_KEY, String(sidebarWidthRef.current));
+        localStorage.setItem(
+          SIDEBAR_WIDTH_KEY,
+          String(sidebarWidthRef.current),
+        );
       } catch {}
     }
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, []);
 
@@ -84,7 +94,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
       touchStartY.current = touch.clientY;
       touchStartX.current = touch.clientX;
     },
-    [isMobile, sidebarEnabled, sidebarOpen]
+    [isMobile, sidebarEnabled, sidebarOpen],
   );
 
   const handleTouchEnd = useCallback(
@@ -99,7 +109,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
         toggleSidebar();
       }
     },
-    [isMobile, sidebarEnabled, sidebarOpen, toggleSidebar]
+    [isMobile, sidebarEnabled, sidebarOpen, toggleSidebar],
   );
 
   // Focus trap on mobile when sidebar is open
@@ -114,7 +124,7 @@ export function Sidebar({ children }: { children?: ReactNode }) {
     firstFocusable?.focus();
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key !== 'Tab') return;
+      if (e.key !== "Tab") return;
       const focusables = getFocusableElements(sidebar);
       if (focusables.length === 0) return;
       const first = focusables[0];
@@ -129,12 +139,12 @@ export function Sidebar({ children }: { children?: ReactNode }) {
       }
     }
 
-    sidebar.addEventListener('keydown', handleKeyDown);
-    return () => sidebar.removeEventListener('keydown', handleKeyDown);
+    sidebar.addEventListener("keydown", handleKeyDown);
+    return () => sidebar.removeEventListener("keydown", handleKeyDown);
   }, [isMobile, sidebarEnabled, sidebarOpen]);
 
   const sidebarStyle: React.CSSProperties & Record<string, string> = {
-    '--sidebar-width': `${sidebarWidth / 16}rem`,
+    "--sidebar-width": `${sidebarWidth / 16}rem`,
   };
 
   if (!sidebarEnabled) return null;
@@ -144,19 +154,19 @@ export function Sidebar({ children }: { children?: ReactNode }) {
   return (
     <aside
       ref={sidebarRef}
-      className={`tool-shell-sidebar ${sidebarOpen ? 'open' : 'collapsed'} ${isResizing ? 'resizing' : ''}`}
+      className={`tool-shell-sidebar ${sidebarOpen ? "open" : "collapsed"} ${isResizing ? "resizing" : ""}`}
       style={sidebarStyle}
       aria-label="Sidebar"
       aria-labelledby="tool-sidebar-title"
-      aria-modal={isMobileOpen ? 'true' : undefined}
-      role={isMobileOpen ? 'dialog' : undefined}
+      aria-modal={isMobileOpen ? "true" : undefined}
+      role={isMobileOpen ? "dialog" : undefined}
       inert={sidebarOpen ? undefined : true}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
       <div className="sidebar-header">
         <span id="tool-sidebar-title" className="sidebar-header-title">
-          {t('options')}
+          {t("options")}
         </span>
       </div>
       <div className="sidebar-content">{children}</div>
@@ -170,10 +180,10 @@ export function Sidebar({ children }: { children?: ReactNode }) {
         aria-valuemax={MAX_SIDEBAR_WIDTH}
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === 'ArrowLeft') {
+          if (e.key === "ArrowLeft") {
             e.preventDefault();
             setSidebarWidth((w) => Math.max(MIN_SIDEBAR_WIDTH, w - 10));
-          } else if (e.key === 'ArrowRight') {
+          } else if (e.key === "ArrowRight") {
             e.preventDefault();
             setSidebarWidth((w) => Math.min(MAX_SIDEBAR_WIDTH, w + 10));
           }
@@ -182,4 +192,4 @@ export function Sidebar({ children }: { children?: ReactNode }) {
     </aside>
   );
 }
-Sidebar.displayName = 'Sidebar';
+Sidebar.displayName = "Sidebar";

@@ -7,6 +7,7 @@ itsjust tools are privacy-first, client-side only applications. No user data lea
 ## Scope
 
 This policy applies to:
+
 - All itsjust tools and repositories
 - The template repository
 - @itsjust/core packages
@@ -46,6 +47,7 @@ This policy applies to:
 ## Security Best Practices
 
 For tool developers:
+
 - Always validate and sanitize user input
 - Use content security policy (CSP) headers
 - Keep dependencies updated (enable Dependabot)

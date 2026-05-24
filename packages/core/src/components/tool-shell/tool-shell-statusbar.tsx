@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { useShell } from './tool-shell-context';
+import type { ReactNode } from "react";
+import { useShell } from "./tool-shell-context";
 
 export function StatusBar({ children }: { children?: ReactNode }) {
   const { config } = useShell();
@@ -17,4 +17,4 @@ export function StatusBar({ children }: { children?: ReactNode }) {
     </footer>
   );
 }
-StatusBar.displayName = 'StatusBar';
+StatusBar.displayName = "StatusBar";

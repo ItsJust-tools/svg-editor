@@ -1,40 +1,50 @@
-import type { ExportFormat, ExportOptions, ExportResult, Exporter, ExporterLoader } from '../types';
-import { jsonExporter, exporterLoaders } from './exporters';
+import type {
+  ExportFormat,
+  ExportOptions,
+  ExportResult,
+  Exporter,
+  ExporterLoader,
+} from "../types";
+import { jsonExporter, exporterLoaders } from "./exporters";
 
 const ALLOWED_DOWNLOAD_TYPES = new Set([
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-  'image/svg+xml',
-  'application/pdf',
-  'application/json',
-  'text/plain',
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/svg+xml",
+  "application/pdf",
+  "application/json",
+  "text/plain",
 ]);
 
 function triggerDownload(result: ExportResult): void {
   if (!result.success || !result.data) return;
 
   const blob =
-    result.data instanceof Blob ? result.data : new Blob([result.data], { type: 'text/plain' });
+    result.data instanceof Blob
+      ? result.data
+      : new Blob([result.data], { type: "text/plain" });
   if (!ALLOWED_DOWNLOAD_TYPES.has(blob.type)) {
     console.error(`[triggerDownload] Blocked unsafe blob type: ${blob.type}`);
     return;
   }
   const url = URL.createObjectURL(blob);
 
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
-  link.download = result.filename.replace(/[\/\\:?*"<>|]/g, '_');
-  link.style.display = 'none';
+  link.download = result.filename.replace(/[\/\\:?*"<>|]/g, "_");
+  link.style.display = "none";
   if (!document.body) {
-    console.error('[triggerDownload] Document body is not ready');
+    console.error("[triggerDownload] Document body is not ready");
     URL.revokeObjectURL(url);
     return;
   }
   document.body.appendChild(link);
-  const isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isIOS =
+    typeof navigator !== "undefined" &&
+    /iPad|iPhone|iPod/.test(navigator.userAgent);
   if (isIOS) {
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   } else {
     link.click();
   }
@@ -44,14 +54,16 @@ function triggerDownload(result: ExportResult): void {
 }
 
 export class ExportEngine {
-  private exporters: Partial<Record<ExportFormat, Exporter>> = { json: jsonExporter };
+  private exporters: Partial<Record<ExportFormat, Exporter>> = {
+    json: jsonExporter,
+  };
   private localLoaders: Partial<Record<ExportFormat, ExporterLoader>>;
   private cachedFormats: ExportFormat[] = [];
   private maxExporterCacheSize: number;
 
   constructor(
     localLoaders?: Partial<Record<ExportFormat, ExporterLoader>>,
-    maxExporterCacheSize = 6
+    maxExporterCacheSize = 6,
   ) {
     this.localLoaders = { ...localLoaders };
     this.maxExporterCacheSize = Math.max(1, maxExporterCacheSize);
@@ -59,7 +71,7 @@ export class ExportEngine {
 
   registerExporter(exporter: Exporter): void {
     this.exporters[exporter.format] = exporter;
-    if (exporter.format !== 'json') {
+    if (exporter.format !== "json") {
       this.touchCache(exporter.format);
     }
   }
@@ -69,7 +81,7 @@ export class ExportEngine {
   }
 
   private touchCache(format: ExportFormat): void {
-    if (format === 'json') return;
+    if (format === "json") return;
     this.cachedFormats = this.cachedFormats.filter((f) => f !== format);
     this.cachedFormats.push(format);
     while (this.cachedFormats.length > this.maxExporterCacheSize) {
@@ -90,7 +102,7 @@ export class ExportEngine {
     if (!loader) return undefined;
 
     const mod = await loader();
-    const exporter = 'default' in mod ? mod.default : mod.exporter;
+    const exporter = "default" in mod ? mod.default : mod.exporter;
     this.exporters[format] = exporter;
     this.touchCache(format);
     return exporter;
@@ -99,7 +111,7 @@ export class ExportEngine {
   async export(
     element: HTMLElement,
     options: ExportOptions,
-    stateSerializer?: () => string
+    stateSerializer?: () => string,
   ): Promise<ExportResult> {
     const exporter = await this.loadExporter(options.format);
     if (!exporter) {
@@ -117,7 +129,7 @@ export class ExportEngine {
   async exportAndDownload(
     element: HTMLElement,
     options: ExportOptions,
-    stateSerializer?: () => string
+    stateSerializer?: () => string,
   ): Promise<ExportResult> {
     const result = await this.export(element, options, stateSerializer);
     if (result.success) {
@@ -129,7 +141,7 @@ export class ExportEngine {
 
 export function createExportEngine(
   localLoaders?: Partial<Record<ExportFormat, ExporterLoader>>,
-  maxExporterCacheSize?: number
+  maxExporterCacheSize?: number,
 ): ExportEngine {
   return new ExportEngine(localLoaders, maxExporterCacheSize);
 }

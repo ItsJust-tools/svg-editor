@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function Error({
   error,
@@ -29,7 +29,7 @@ export default function Error({
           </svg>
         </div>
         <h1>Something went wrong</h1>
-        <p>{error.message || 'An unexpected error occurred.'}</p>
+        <p>{error.message || "An unexpected error occurred."}</p>
         <div className="error-actions">
           <button onClick={reset} className="error-btn-primary">
             Try again

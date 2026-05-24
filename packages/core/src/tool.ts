@@ -1,11 +1,13 @@
-import type { ToolConfig, ExportFormat, ExporterLoader } from './types';
+import type { ToolConfig, ExportFormat, ExporterLoader } from "./types";
 
 export interface ToolExporterDefinition {
   format: ExportFormat;
   loader: ExporterLoader;
 }
 
-export type DeserializeResult<T> = { success: true; data: T } | { success: false; error: string };
+export type DeserializeResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
 
 /**
  * Contract that every itsjust tool must implement.

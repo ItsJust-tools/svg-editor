@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import type { ToolPlugin, FeatureFlags } from '../types/plugin';
+import { useMemo } from "react";
+import type { ToolPlugin, FeatureFlags } from "../types/plugin";
 
 /**
  * usePlugins — Build a plugin map from a declarative plugin list.
@@ -11,7 +11,7 @@ import type { ToolPlugin, FeatureFlags } from '../types/plugin';
  */
 export function usePlugins(plugins: ToolPlugin[], features: FeatureFlags) {
   return useMemo(() => {
-    const result: Record<ToolPlugin['slot'], ToolPlugin[]> = {
+    const result: Record<ToolPlugin["slot"], ToolPlugin[]> = {
       toolbar: [],
       sidebar: [],
       statusBar: [],
@@ -23,7 +23,7 @@ export function usePlugins(plugins: ToolPlugin[], features: FeatureFlags) {
       result[plugin.slot].push(plugin);
     }
 
-    for (const slot of Object.keys(result) as Array<ToolPlugin['slot']>) {
+    for (const slot of Object.keys(result) as Array<ToolPlugin["slot"]>) {
       result[slot].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
     }
 

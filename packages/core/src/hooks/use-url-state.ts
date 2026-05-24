@@ -1,8 +1,11 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
-import type { DeserializeResult } from '../tool';
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string";
+import type { DeserializeResult } from "../tool";
 
 interface UseUrlStateOptions {
   /** Tool ID for the shared URL query param. */
@@ -14,7 +17,7 @@ interface UseUrlStateOptions {
   /** Called when state is successfully loaded from the URL on mount. */
   onStateLoaded: (data: unknown) => void;
   /** Show a toast notification. */
-  showToast: (message: string, type: 'success' | 'error') => void;
+  showToast: (message: string, type: "success" | "error") => void;
 }
 
 interface UseUrlStateReturn {
@@ -49,19 +52,20 @@ export function useUrlState(options: UseUrlStateOptions): UseUrlStateReturn {
     if (loadedRef.current) return;
     loadedRef.current = true;
     const params = new URLSearchParams(window.location.search);
-    const encoded = params.get('state');
+    const encoded = params.get("state");
     if (!encoded) return;
     try {
       const decompressed = decompressFromEncodedURIComponent(encoded);
-      if (!decompressed) throw new Error('Invalid shared URL state');
+      if (!decompressed) throw new Error("Invalid shared URL state");
       const parsed: unknown = JSON.parse(decompressed);
       const result = deserialize(parsed);
       if (!result.success) throw new Error(result.error);
       onStateLoaded(result.data);
-      showToast('Loaded state from shared URL', 'success');
+      showToast("Loaded state from shared URL", "success");
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Failed to load shared state';
-      showToast(msg, 'error');
+      const msg =
+        error instanceof Error ? error.message : "Failed to load shared state";
+      showToast(msg, "error");
     }
   }, [toolId, deserialize, onStateLoaded, showToast]);
 
@@ -71,34 +75,36 @@ export function useUrlState(options: UseUrlStateOptions): UseUrlStateReturn {
       try {
         const serialized = serialize();
         const encoded = compressToEncodedURIComponent(serialized);
-        if (!encoded) throw new Error('Failed to encode state');
+        if (!encoded) throw new Error("Failed to encode state");
         const url = new URL(window.location.href);
-        url.searchParams.set('state', encoded);
-        url.searchParams.set('tool', toolId);
-        window.history.replaceState(null, '', url.toString());
+        url.searchParams.set("state", encoded);
+        url.searchParams.set("tool", toolId);
+        window.history.replaceState(null, "", url.toString());
         const shareUrl = url.toString();
         if (navigator.share && title) {
           try {
             await navigator.share({ title, url: shareUrl });
           } catch (error) {
             // AbortError means the user cancelled the share dialog — not an error
-            if (error instanceof Error && error.name !== 'AbortError') throw error;
+            if (error instanceof Error && error.name !== "AbortError")
+              throw error;
             return shareUrl;
           }
         } else {
           await navigator.clipboard.writeText(shareUrl);
         }
-        showToast('Share URL copied to clipboard', 'success');
+        showToast("Share URL copied to clipboard", "success");
         return shareUrl;
       } catch (error) {
-        const msg = error instanceof Error ? error.message : 'Failed to create share URL';
-        showToast(msg, 'error');
+        const msg =
+          error instanceof Error ? error.message : "Failed to create share URL";
+        showToast(msg, "error");
         return null;
       } finally {
         setIsSharing(false);
       }
     },
-    [toolId, serialize, showToast]
+    [toolId, serialize, showToast],
   );
 
   return { createShareUrl, isSharing };

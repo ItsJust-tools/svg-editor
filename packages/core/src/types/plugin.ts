@@ -1,5 +1,5 @@
-import type { ComponentType } from 'react';
-import type { FeatureFlags } from './tool-config';
+import type { ComponentType } from "react";
+import type { FeatureFlags } from "./tool-config";
 
 export type { FeatureFlags };
 
@@ -11,7 +11,7 @@ export interface ToolPlugin {
   /** Unique plugin identifier (e.g. 'sidebar-panel', 'toolbar-extra') */
   id: string;
   /** Where the plugin should be mounted in the shell */
-  slot: 'toolbar' | 'sidebar' | 'statusBar' | 'canvas';
+  slot: "toolbar" | "sidebar" | "statusBar" | "canvas";
   /** React component mounted by ToolShell */
   Component: ComponentType;
   /** Optional rendering order (lower first) */

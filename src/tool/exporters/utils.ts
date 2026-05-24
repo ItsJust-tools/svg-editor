@@ -1,8 +1,14 @@
-import type { ExportFormat, ExportOptions, ExportResult, Exporter } from '@itsjust/core';
-import { toBlob } from 'html-to-image';
+import type {
+  ExportFormat,
+  ExportOptions,
+  ExportResult,
+  Exporter,
+} from "@itsjust/core";
+import { toBlob } from "html-to-image";
 
 export function formatExportError(error: unknown, format: string): string {
-  const base = error instanceof Error ? error.message : `${format} export failed`;
+  const base =
+    error instanceof Error ? error.message : `${format} export failed`;
   const isCors = /cors|cross-origin|tainted|security/i.test(base);
   if (isCors) {
     return `${base}. Try removing external images or enable CORS on your assets.`;
@@ -12,7 +18,7 @@ export function formatExportError(error: unknown, format: string): string {
 
 export function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
-    throw new DOMException('Export aborted', 'AbortError');
+    throw new DOMException("Export aborted", "AbortError");
   }
 }
 
@@ -34,13 +40,15 @@ function restoreStyles(saved: SavedStyle[]) {
 
 export async function renderToImage(
   element: HTMLElement,
-  options: ExportOptions
+  options: ExportOptions,
 ): Promise<HTMLCanvasElement> {
   throwIfAborted(options.signal);
   if (!options.allowSensitiveData) {
-    const sensitive = element.querySelector('input[type="password"], [data-sensitive="true"]');
+    const sensitive = element.querySelector(
+      'input[type="password"], [data-sensitive="true"]',
+    );
     if (sensitive) {
-      throw new Error('Export blocked: sensitive elements detected');
+      throw new Error("Export blocked: sensitive elements detected");
     }
   }
 
@@ -54,47 +62,51 @@ export async function renderToImage(
   const originalWidth = element.offsetWidth;
 
   // Create an off-screen container with unlimited space
-  const container = document.createElement('div');
-  container.style.position = 'fixed';
-  container.style.top = '0';
-  container.style.left = '-9999px';
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.top = "0";
+  container.style.left = "-9999px";
   container.style.width = `${originalWidth}px`;
-  container.style.pointerEvents = 'none';
-  container.style.zIndex = '-1';
+  container.style.pointerEvents = "none";
+  container.style.zIndex = "-1";
 
   // Move the original element into the off-screen container
   container.appendChild(element);
   document.body.appendChild(container);
 
   // Expand the element so nothing clips
-  saveStyle(saved, element, 'overflow');
-  saveStyle(saved, element, 'height');
-  saveStyle(saved, element, 'min-height');
-  element.style.overflow = 'visible';
-  element.style.height = 'auto';
-  element.style.minHeight = '0';
+  saveStyle(saved, element, "overflow");
+  saveStyle(saved, element, "height");
+  saveStyle(saved, element, "min-height");
+  element.style.overflow = "visible";
+  element.style.height = "auto";
+  element.style.minHeight = "0";
 
   // Inline computed background so theme survives SVG serialization
   const computedBg = window.getComputedStyle(element).backgroundColor;
-  if (computedBg && computedBg !== 'rgba(0, 0, 0, 0)' && computedBg !== 'transparent') {
-    saveStyle(saved, element, 'background-color');
+  if (
+    computedBg &&
+    computedBg !== "rgba(0, 0, 0, 0)" &&
+    computedBg !== "transparent"
+  ) {
+    saveStyle(saved, element, "background-color");
     element.style.backgroundColor = computedBg;
   }
 
   // Expand textarea to its full scroll height
-  const textarea = element.querySelector('textarea');
+  const textarea = element.querySelector("textarea");
   if (textarea) {
     const ta = textarea as HTMLTextAreaElement;
-    saveStyle(saved, ta, 'flex');
-    saveStyle(saved, ta, 'height');
-    saveStyle(saved, ta, 'min-height');
-    saveStyle(saved, ta, 'max-height');
-    saveStyle(saved, ta, 'overflow');
-    ta.style.flex = 'none';
+    saveStyle(saved, ta, "flex");
+    saveStyle(saved, ta, "height");
+    saveStyle(saved, ta, "min-height");
+    saveStyle(saved, ta, "max-height");
+    saveStyle(saved, ta, "overflow");
+    ta.style.flex = "none";
     ta.style.height = `${ta.scrollHeight}px`;
-    ta.style.minHeight = '0';
-    ta.style.maxHeight = 'none';
-    ta.style.overflow = 'visible';
+    ta.style.minHeight = "0";
+    ta.style.maxHeight = "none";
+    ta.style.overflow = "visible";
   }
 
   try {
@@ -105,23 +117,23 @@ export async function renderToImage(
     });
 
     if (!blob) {
-      throw new Error('Failed to create image blob');
+      throw new Error("Failed to create image blob");
     }
 
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     const img = new Image();
 
     await new Promise<void>((resolve, reject) => {
       img.onload = () => resolve();
-      img.onerror = () => reject(new Error('Failed to load image'));
+      img.onerror = () => reject(new Error("Failed to load image"));
       img.src = URL.createObjectURL(blob);
     });
 
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) {
-      throw new Error('Failed to get canvas context');
+      throw new Error("Failed to get canvas context");
     }
     ctx.drawImage(img, 0, 0);
     URL.revokeObjectURL(img.src);
@@ -143,9 +155,9 @@ export async function renderToImage(
 
 export function createCanvasExporter(
   format: ExportFormat,
-  mimeType: 'image/png' | 'image/jpeg' | 'image/webp',
-  defaultExt: 'png' | 'jpg' | 'webp',
-  defaultQuality?: number
+  mimeType: "image/png" | "image/jpeg" | "image/webp",
+  defaultExt: "png" | "jpg" | "webp",
+  defaultQuality?: number,
 ): Exporter {
   return {
     format,
@@ -155,9 +167,10 @@ export function createCanvasExporter(
         const quality = options.quality ?? defaultQuality;
         const blob = await new Promise<Blob>((resolve, reject) => {
           canvas.toBlob(
-            (b) => (b ? resolve(b) : reject(new Error('Failed to create blob'))),
+            (b) =>
+              b ? resolve(b) : reject(new Error("Failed to create blob")),
             mimeType,
-            quality
+            quality,
           );
         });
         return {

@@ -100,30 +100,30 @@ npx vercel
 Every tool must implement the `Tool` interface from `@itsjust/core`:
 
 ```ts
-import type { Tool } from '@itsjust/core';
+import type { Tool } from "@itsjust/core";
 
 export const myTool: Tool<MyState> = {
-  id: 'pixel-art',
-  name: 'Pixel Art',
-  version: '1.0.0',
+  id: "pixel-art",
+  name: "Pixel Art",
+  version: "1.0.0",
   config: toolConfig,
-  initialState: { grid: [], color: '#000' },
+  initialState: { grid: [], color: "#000" },
   serialize: (state) => JSON.stringify(state),
   deserialize: (data) => {
     // Validate and parse imported data
-    if (typeof data !== 'object' || data === null) {
-      return { success: false, error: 'Invalid data: expected object' };
+    if (typeof data !== "object" || data === null) {
+      return { success: false, error: "Invalid data: expected object" };
     }
     const record = data as Record<string, unknown>;
     return {
       success: true,
       data: {
         grid: Array.isArray(record.grid) ? record.grid : [],
-        color: typeof record.color === 'string' ? record.color : '#000',
+        color: typeof record.color === "string" ? record.color : "#000",
       },
     };
   },
-  exporters: [{ format: 'png', loader: () => import('./exporters/png') }],
+  exporters: [{ format: "png", loader: () => import("./exporters/png") }],
 };
 ```
 
@@ -149,11 +149,11 @@ Edit `src/tool/tool.config.ts`:
 
 ```ts
 const toolConfig: ToolConfig = {
-  id: 'pixel-art',
-  name: 'Pixel Art',
-  description: 'Create pixel art in your browser',
-  version: '1.0.0',
-  exportFormats: ['json'],
+  id: "pixel-art",
+  name: "Pixel Art",
+  description: "Create pixel art in your browser",
+  version: "1.0.0",
+  exportFormats: ["json"],
   features: {
     export: true,
     autoSave: true,
@@ -163,11 +163,11 @@ const toolConfig: ToolConfig = {
     darkMode: true,
   },
   theme: {
-    accent: '#ef4444',
-    accentHover: '#dc2626',
-    accentSubtle: 'rgba(239, 68, 68, 0.08)',
-    brand: 'Pixel Art',
-    icon: '🎨',
+    accent: "#ef4444",
+    accentHover: "#dc2626",
+    accentSubtle: "rgba(239, 68, 68, 0.08)",
+    brand: "Pixel Art",
+    icon: "🎨",
   },
 };
 ```
@@ -422,21 +422,23 @@ Test your tool logic with Vitest:
 
 ```ts
 // __tests__/unit/tool/pixel-art.test.ts
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 
 function setPixel(grid: string[][], x: number, y: number, color: string) {
-  return grid.map((row, ry) => (ry === y ? row.map((c, rx) => (rx === x ? color : c)) : row));
+  return grid.map((row, ry) =>
+    ry === y ? row.map((c, rx) => (rx === x ? color : c)) : row,
+  );
 }
 
-describe('setPixel', () => {
-  it('changes the color at the given coordinate', () => {
+describe("setPixel", () => {
+  it("changes the color at the given coordinate", () => {
     const grid = [
-      ['#fff', '#fff'],
-      ['#fff', '#fff'],
+      ["#fff", "#fff"],
+      ["#fff", "#fff"],
     ];
-    expect(setPixel(grid, 0, 1, '#f00')).toEqual([
-      ['#fff', '#fff'],
-      ['#f00', '#fff'],
+    expect(setPixel(grid, 0, 1, "#f00")).toEqual([
+      ["#fff", "#fff"],
+      ["#f00", "#fff"],
     ]);
   });
 });
@@ -461,12 +463,12 @@ Playwright tests live in `__tests__/e2e/`:
 
 ```ts
 // __tests__/e2e/tool.spec.ts
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('exports json', async ({ page }) => {
-  await page.goto('/');
-  await page.click('text=Export');
-  await page.click('text=JSON Data');
+test("exports json", async ({ page }) => {
+  await page.goto("/");
+  await page.click("text=Export");
+  await page.click("text=JSON Data");
   // assert download
 });
 ```
@@ -530,7 +532,13 @@ When handing this codebase to an LLM (e.g., Claude, GPT), provide these exact in
 
 ```ts
 // Components
-export { ToolShell, ImportExport, ThemeProvider, ToastProvider, KeyboardShortcutsOverlay };
+export {
+  ToolShell,
+  ImportExport,
+  ThemeProvider,
+  ToastProvider,
+  KeyboardShortcutsOverlay,
+};
 
 // Hooks
 export {
@@ -565,7 +573,7 @@ export type {
 };
 
 // Testing
-export { renderTool, createMockToolState } from './testing';
+export { renderTool, createMockToolState } from "./testing";
 ```
 
 ---

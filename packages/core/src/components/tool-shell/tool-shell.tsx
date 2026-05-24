@@ -1,23 +1,36 @@
-'use client';
+"use client";
 
-import { lazy, Suspense, useState, useCallback, useEffect, useMemo, type ReactNode } from 'react';
-import type { ToolConfig, ToolPlugin } from '../../types';
-import { ShellContext, type ToolbarActions } from './tool-shell-context';
-import { Toolbar } from './tool-shell-toolbar';
-import { Body } from './tool-shell-body';
-import { Sidebar } from './tool-shell-sidebar';
-import { Canvas } from './tool-shell-canvas';
-import { StatusBar } from './tool-shell-statusbar';
-import { LoadingSkeleton } from './tool-shell-loading';
-import { useKeyboardShortcuts, buildDefaultShortcutGroups } from './tool-shell-shortcuts';
-import { ErrorBoundary } from '../error-boundary/error-boundary';
-import { usePlugins } from '../../hooks/use-plugins';
-import { t } from '../../i18n/strings';
+import {
+  lazy,
+  Suspense,
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  type ReactNode,
+} from "react";
+import type { ToolConfig, ToolPlugin } from "../../types";
+import { ShellContext, type ToolbarActions } from "./tool-shell-context";
+import { Toolbar } from "./tool-shell-toolbar";
+import { Body } from "./tool-shell-body";
+import { Sidebar } from "./tool-shell-sidebar";
+import { Canvas } from "./tool-shell-canvas";
+import { StatusBar } from "./tool-shell-statusbar";
+import { LoadingSkeleton } from "./tool-shell-loading";
+import {
+  useKeyboardShortcuts,
+  buildDefaultShortcutGroups,
+} from "./tool-shell-shortcuts";
+import { ErrorBoundary } from "../error-boundary/error-boundary";
+import { usePlugins } from "../../hooks/use-plugins";
+import { t } from "../../i18n/strings";
 
-export { type ToolbarActions } from './tool-shell-context';
+export { type ToolbarActions } from "./tool-shell-context";
 export { LoadingSkeleton };
 
-const KeyboardShortcutsOverlay = lazy(() => import('../keyboard-shortcuts/keyboard-shortcuts'));
+const KeyboardShortcutsOverlay = lazy(
+  () => import("../keyboard-shortcuts/keyboard-shortcuts"),
+);
 
 /**
  * Props for the main application shell that wraps every itsjust tool.
@@ -66,9 +79,13 @@ export function ToolShell({
   const sidebarSlot = slots?.sidebar ?? sidebar;
   const canvasSlot = slots?.canvas ?? canvas;
   const statusBarSlot = slots?.statusBar ?? statusBar;
-  const [internalSidebarOpen, setInternalSidebarOpen] = useState(config.features.sidebar);
+  const [internalSidebarOpen, setInternalSidebarOpen] = useState(
+    config.features.sidebar,
+  );
   const isControlled = controlledSidebarOpen !== undefined;
-  const sidebarOpen = isControlled ? controlledSidebarOpen : internalSidebarOpen;
+  const sidebarOpen = isControlled
+    ? controlledSidebarOpen
+    : internalSidebarOpen;
 
   const toggleSidebar = useCallback(() => {
     const wasOpen = sidebarOpen;
@@ -80,7 +97,7 @@ export function ToolShell({
     // Focus restoration: when closing sidebar, return focus to toggle button
     if (wasOpen) {
       requestAnimationFrame(() => {
-        const toggleBtn = document.querySelector('[data-sidebar-toggle]');
+        const toggleBtn = document.querySelector("[data-sidebar-toggle]");
         if (toggleBtn instanceof HTMLElement) {
           toggleBtn.focus();
         }
@@ -93,11 +110,11 @@ export function ToolShell({
   const openShortcuts = useCallback(() => setShortcutsOpen(true), []);
 
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 48rem)');
+    const media = window.matchMedia("(max-width: 48rem)");
     const update = () => setIsMobile(media.matches);
     update();
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
   }, []);
 
   const shellActions = useMemo<ToolbarActions>(
@@ -106,7 +123,7 @@ export function ToolShell({
       onToggleSidebar: toggleSidebar,
       onShowShortcuts: openShortcuts,
     }),
-    [actions, toggleSidebar, openShortcuts]
+    [actions, toggleSidebar, openShortcuts],
   );
 
   useKeyboardShortcuts(shellActions, openShortcuts);
@@ -118,17 +135,29 @@ export function ToolShell({
   }, [config]);
 
   const shellContextValue = useMemo(
-    () => ({ config, readOnly, sidebarOpen, toggleSidebar, actions: shellActions, isMobile }),
-    [config, readOnly, sidebarOpen, toggleSidebar, shellActions, isMobile]
+    () => ({
+      config,
+      readOnly,
+      sidebarOpen,
+      toggleSidebar,
+      actions: shellActions,
+      isMobile,
+    }),
+    [config, readOnly, sidebarOpen, toggleSidebar, shellActions, isMobile],
   );
 
   const pluginMap = usePlugins(plugins, config.features);
 
   return (
     <ShellContext.Provider value={shellContextValue}>
-      <div id="main-content" className="tool-shell" data-tool={config.id} data-readonly={readOnly ? 'true' : 'false'}>
+      <div
+        id="main-content"
+        className="tool-shell"
+        data-tool={config.id}
+        data-readonly={readOnly ? "true" : "false"}
+      >
         <a href="#tool-canvas" className="skip-link">
-          {t('skipToContent')}
+          {t("skipToContent")}
         </a>
         <Toolbar>
           {toolbarSlot}
@@ -188,4 +217,4 @@ export function ToolShell({
     </ShellContext.Provider>
   );
 }
-ToolShell.displayName = 'ToolShell';
+ToolShell.displayName = "ToolShell";

@@ -1,6 +1,11 @@
 export function LoadingSkeleton() {
   return (
-    <div className="tool-shell" data-tool="loading" aria-busy="true" aria-label="Loading">
+    <div
+      className="tool-shell"
+      data-tool="loading"
+      aria-busy="true"
+      aria-label="Loading"
+    >
       <div className="toolbar-skeleton" />
       <div className="canvas-skeleton">
         <div className="skeleton-pulse" />
@@ -9,4 +14,4 @@ export function LoadingSkeleton() {
     </div>
   );
 }
-LoadingSkeleton.displayName = 'LoadingSkeleton';
+LoadingSkeleton.displayName = "LoadingSkeleton";

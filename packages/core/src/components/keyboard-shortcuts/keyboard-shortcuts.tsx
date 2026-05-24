@@ -1,28 +1,31 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
-import type { ShortcutGroup } from '../../types';
-import { t } from '../../i18n/strings';
+import { useEffect, useRef } from "react";
+import type { ShortcutGroup } from "../../types";
+import { t } from "../../i18n/strings";
 
 interface KeyboardShortcutsOverlayProps {
   groups: ShortcutGroup[];
   onClose: () => void;
 }
 
-export function KeyboardShortcutsOverlay({ groups, onClose }: KeyboardShortcutsOverlayProps) {
+export function KeyboardShortcutsOverlay({
+  groups,
+  onClose,
+}: KeyboardShortcutsOverlayProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handler(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         e.preventDefault();
         onClose();
         return;
       }
 
-      if (e.key === 'Tab' && ref.current) {
+      if (e.key === "Tab" && ref.current) {
         const focusable = ref.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         );
         const first = focusable[0];
         const last = focusable[focusable.length - 1];
@@ -40,8 +43,8 @@ export function KeyboardShortcutsOverlay({ groups, onClose }: KeyboardShortcutsO
         }
       }
     }
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
 
   useEffect(() => {
@@ -50,13 +53,16 @@ export function KeyboardShortcutsOverlay({ groups, onClose }: KeyboardShortcutsO
     const handler = (e: MouseEvent) => {
       if (e.target === el) onClose();
     };
-    el.addEventListener('mousedown', handler);
-    return () => el.removeEventListener('mousedown', handler);
+    el.addEventListener("mousedown", handler);
+    return () => el.removeEventListener("mousedown", handler);
   }, [onClose]);
 
   useEffect(() => {
-    const prev = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const first = ref.current?.querySelector<HTMLElement>('.shortcuts-close');
+    const prev =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const first = ref.current?.querySelector<HTMLElement>(".shortcuts-close");
     first?.focus();
     return () => {
       if (prev && document.body.contains(prev)) {
@@ -71,16 +77,16 @@ export function KeyboardShortcutsOverlay({ groups, onClose }: KeyboardShortcutsO
       ref={ref}
       aria-modal="true"
       role="dialog"
-      aria-label={t('keyboardShortcuts')}
+      aria-label={t("keyboardShortcuts")}
     >
       <div className="shortcuts-card">
         <div className="shortcuts-header">
-          <h2 className="shortcuts-title">{t('keyboardShortcuts')}</h2>
-          <span className="shortcuts-hint">{t('pressToToggle')}</span>
+          <h2 className="shortcuts-title">{t("keyboardShortcuts")}</h2>
+          <span className="shortcuts-hint">{t("pressToToggle")}</span>
           <button
             className="shortcuts-close"
             onClick={onClose}
-            aria-label={t('closeShortcuts')}
+            aria-label={t("closeShortcuts")}
             type="button"
           >
             <svg
@@ -105,7 +111,10 @@ export function KeyboardShortcutsOverlay({ groups, onClose }: KeyboardShortcutsO
                   <span className="shortcut-label">
                     {s.label}
                     {s.description && (
-                      <span className="shortcut-description"> &mdash; {s.description}</span>
+                      <span className="shortcut-description">
+                        {" "}
+                        &mdash; {s.description}
+                      </span>
                     )}
                   </span>
                   <span className="shortcut-keys">
@@ -120,5 +129,5 @@ export function KeyboardShortcutsOverlay({ groups, onClose }: KeyboardShortcutsO
     </div>
   );
 }
-KeyboardShortcutsOverlay.displayName = 'KeyboardShortcutsOverlay';
+KeyboardShortcutsOverlay.displayName = "KeyboardShortcutsOverlay";
 export default KeyboardShortcutsOverlay;

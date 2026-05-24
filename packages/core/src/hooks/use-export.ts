@@ -1,13 +1,18 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { ExportFormat, ExportOptions, ToolConfig, ExporterLoader } from '../types';
-import { createExportEngine } from '../engines/export-engine';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type {
+  ExportFormat,
+  ExportOptions,
+  ToolConfig,
+  ExporterLoader,
+} from "../types";
+import { createExportEngine } from "../engines/export-engine";
 
 function getAvailableFormats(
-  exporters?: Array<{ format: ExportFormat; loader: ExporterLoader }>
+  exporters?: Array<{ format: ExportFormat; loader: ExporterLoader }>,
 ): ExportFormat[] {
-  const builtin: ExportFormat[] = ['json'];
+  const builtin: ExportFormat[] = ["json"];
   const registered = exporters?.map((e) => e.format) ?? [];
   return [...builtin, ...registered];
 }
@@ -29,13 +34,19 @@ export function useExport(
   canvasRef: React.RefObject<HTMLElement | null>,
   config: ToolConfig,
   stateSerializer?: () => string,
-  exporters?: Array<{ format: ExportFormat; loader: ExporterLoader }>
+  exporters?: Array<{ format: ExportFormat; loader: ExporterLoader }>,
 ) {
   const localLoaders = useMemo(
-    () => (exporters ? Object.fromEntries(exporters.map((e) => [e.format, e.loader])) : undefined),
-    [exporters]
+    () =>
+      exporters
+        ? Object.fromEntries(exporters.map((e) => [e.format, e.loader]))
+        : undefined,
+    [exporters],
   );
-  const engine = useMemo(() => createExportEngine(localLoaders), [localLoaders]);
+  const engine = useMemo(
+    () => createExportEngine(localLoaders),
+    [localLoaders],
+  );
   const [isExporting, setIsExporting] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -43,20 +54,20 @@ export function useExport(
   const available = useMemo(() => getAvailableFormats(exporters), [exporters]);
   const missing = useMemo(
     () => config.exportFormats.filter((f) => !available.includes(f)),
-    [available, config.exportFormats]
+    [available, config.exportFormats],
   );
   const supportedFormats = useMemo(
     () => config.exportFormats.filter((f) => available.includes(f)),
-    [available, config.exportFormats]
+    [available, config.exportFormats],
   );
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     const preload = () => {
-      const warm = config.exportFormats.filter((f) => f !== 'json').slice(0, 2);
+      const warm = config.exportFormats.filter((f) => f !== "json").slice(0, 2);
       void Promise.all(warm.map((f) => engine.loadExporter(f)));
     };
-    if ('requestIdleCallback' in window) {
+    if ("requestIdleCallback" in window) {
       const id = window.requestIdleCallback(preload, { timeout: 1500 });
       return () => window.cancelIdleCallback(id);
     }
@@ -68,8 +79,8 @@ export function useExport(
     if (missing.length === 0 || hasWarnedRef.current) return;
     hasWarnedRef.current = true;
     console.warn(
-      `[useExport] Config declares exportFormats [${missing.join(', ')}] but no exporters are registered for them. ` +
-        `Add the corresponding exporter to your Tool definition or remove the format from config.exportFormats.`
+      `[useExport] Config declares exportFormats [${missing.join(", ")}] but no exporters are registered for them. ` +
+        `Add the corresponding exporter to your Tool definition or remove the format from config.exportFormats.`,
     );
   }, [missing]);
 
@@ -90,7 +101,7 @@ export function useExport(
           data: null,
           filename: options?.filename ?? `export-${Date.now()}`,
           format,
-          error: 'Export target is not ready',
+          error: "Export target is not ready",
         };
       }
       abortControllerRef.current?.abort();
@@ -101,8 +112,9 @@ export function useExport(
       try {
         const merged: ExportOptions = {
           format,
-          scale: typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 2,
-          background: '#ffffff',
+          scale:
+            typeof window !== "undefined" ? window.devicePixelRatio || 1 : 2,
+          background: "#ffffff",
           allowSensitiveData: false,
           ...options,
           signal: controller.signal,
@@ -110,11 +122,12 @@ export function useExport(
         return await engine.exportAndDownload(
           canvasRef.current,
           merged,
-          stateSerializer
+          stateSerializer,
         );
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Export failed';
-        console.error('[useExport]', message);
+        const message =
+          error instanceof Error ? error.message : "Export failed";
+        console.error("[useExport]", message);
         return {
           success: false,
           data: null,
@@ -128,7 +141,7 @@ export function useExport(
         abortControllerRef.current = null;
       }
     },
-    [canvasRef, stateSerializer]
+    [canvasRef, stateSerializer],
   );
 
   return {

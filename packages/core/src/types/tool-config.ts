@@ -48,4 +48,4 @@ export const defaultFeatures: FeatureFlags = {
   darkMode: true,
 };
 
-export type ExportFormat = 'png' | 'pdf' | 'json' | 'jpeg' | 'webp';
+export type ExportFormat = "png" | "pdf" | "json" | "jpeg" | "webp";

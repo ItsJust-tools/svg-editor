@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useCallback, useMemo } from 'react';
-import type { Tool } from '../tool';
-import type { ExportFormat } from '../types';
-import type { ToolbarActions } from '../components/tool-shell';
-import { useToolState } from './use-tool-state';
-import { useExport } from './use-export';
-import { useImport } from './use-import';
-import { useToast } from '../components/toast';
-import { t } from '../i18n/strings';
+import { useCallback, useMemo } from "react";
+import type { Tool } from "../tool";
+import type { ExportFormat } from "../types";
+import type { ToolbarActions } from "../components/tool-shell";
+import { useToolState } from "./use-tool-state";
+import { useExport } from "./use-export";
+import { useImport } from "./use-import";
+import { useToast } from "../components/toast";
+import { t } from "../i18n/strings";
 
 export interface UseToolResult<TState> {
   /** Managed tool state (undo/redo/auto-save) */
@@ -16,7 +16,7 @@ export interface UseToolResult<TState> {
   /** Ready-to-use toolbar actions for <ToolShell> */
   toolbarActions: ToolbarActions;
   /** Import a file (pass to <ImportExport>) */
-  importFromFile: (file: File) => Promise<import('./use-import').ImportResult>;
+  importFromFile: (file: File) => Promise<import("./use-import").ImportResult>;
   /** Whether an import is in progress */
   isImporting: boolean;
   /** Whether an export is in progress */
@@ -24,11 +24,13 @@ export interface UseToolResult<TState> {
   /** Abort the current export operation */
   abortExport: () => void;
   /** Export handler (pass to <ImportExport>) */
-  handleExport: (format: ExportFormat) => Promise<{ success: boolean; error?: string }>;
+  handleExport: (
+    format: ExportFormat,
+  ) => Promise<{ success: boolean; error?: string }>;
   /** Formats this tool supports */
   supportedFormats: ExportFormat[];
   /** Show a toast notification */
-  toast: (message: string, type?: 'success' | 'error') => void;
+  toast: (message: string, type?: "success" | "error") => void;
 }
 
 /**
@@ -46,20 +48,20 @@ export interface UseToolResult<TState> {
  */
 export function useTool<TState>(
   tool: Tool<TState>,
-  canvasRef: React.RefObject<HTMLElement | null>
+  canvasRef: React.RefObject<HTMLElement | null>,
 ): UseToolResult<TState> {
   const canonicalId = tool.config.id;
   const canonicalName = tool.config.name;
   const canonicalVersion = tool.config.version;
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== "production") {
     if (
       tool.id !== canonicalId ||
       tool.name !== canonicalName ||
       tool.version !== canonicalVersion
     ) {
       console.warn(
-        '[useTool] Tool top-level id/name/version differ from config; config values take precedence.'
+        "[useTool] Tool top-level id/name/version differ from config; config values take precedence.",
       );
     }
   }
@@ -69,7 +71,7 @@ export function useTool<TState>(
     canvasRef,
     tool.config,
     () => tool.serialize(state.data),
-    tool.exporters
+    tool.exporters,
   );
   const { importFromFile, isImporting } = useImport({
     acceptedFormats: tool.config.exportFormats,
@@ -79,7 +81,7 @@ export function useTool<TState>(
         if (deserialized.success) {
           state.setData(deserialized.data);
         } else {
-          toast(deserialized.error, 'error');
+          toast(deserialized.error, "error");
         }
       }
     },
@@ -90,22 +92,22 @@ export function useTool<TState>(
     async (format: ExportFormat) => {
       const result = await exportTo(format);
       if (result?.success) {
-        toast(`Exported as .${format}`, 'success');
+        toast(`Exported as .${format}`, "success");
         return { success: true };
       } else {
-        const error = result?.error ?? 'Export failed';
-        toast(error, 'error');
+        const error = result?.error ?? "Export failed";
+        toast(error, "error");
         return { success: false, error };
       }
     },
-    [exportTo, toast]
+    [exportTo, toast],
   );
 
   const { canUndo, canRedo, undo, redo, setData } = state;
 
   const handleReset = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      const confirmed = window.confirm(t('resetConfirm'));
+    if (typeof window !== "undefined") {
+      const confirmed = window.confirm(t("resetConfirm"));
       if (!confirmed) return;
     }
     setData(tool.initialState);
@@ -121,7 +123,7 @@ export function useTool<TState>(
       onReset: handleReset,
       supportedFormats,
     }),
-    [canUndo, canRedo, undo, redo, handleExport, handleReset, supportedFormats]
+    [canUndo, canRedo, undo, redo, handleExport, handleReset, supportedFormats],
   );
 
   return {

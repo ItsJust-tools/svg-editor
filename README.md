@@ -91,11 +91,11 @@ Follow these steps in order. Do not skip.
 2. Edit `src/tool/tool.config.ts`:
    ```ts
    const toolConfig: ToolConfig = {
-     id: 'markdown-editor',
-     name: 'Markdown Editor',
-     description: 'A minimal markdown editor with live preview',
-     version: '1.0.0',
-     exportFormats: ['json', 'png'],
+     id: "markdown-editor",
+     name: "Markdown Editor",
+     description: "A minimal markdown editor with live preview",
+     version: "1.0.0",
+     exportFormats: ["json", "png"],
      features: {
        export: true,
        autoSave: true,
@@ -105,11 +105,11 @@ Follow these steps in order. Do not skip.
        darkMode: true,
      },
      theme: {
-       accent: '#10b981',
-       accentHover: '#059669',
-       accentSubtle: 'rgba(16, 185, 129, 0.08)',
-       brand: 'Markdown Editor',
-       icon: '📝',
+       accent: "#10b981",
+       accentHover: "#059669",
+       accentSubtle: "rgba(16, 185, 129, 0.08)",
+       brand: "Markdown Editor",
+       icon: "📝",
      },
      shortcuts: [],
    };
@@ -126,19 +126,19 @@ Follow these steps in order. Do not skip.
      name: toolConfig.name,
      version: toolConfig.version,
      config: toolConfig,
-     initialState: { markdown: '# Hello World' },
+     initialState: { markdown: "# Hello World" },
      serialize: (state) => JSON.stringify(state, null, 2),
      deserialize: (data) => {
-       if (typeof data !== 'object' || data === null) {
-         return { success: false, error: 'Invalid data format' };
+       if (typeof data !== "object" || data === null) {
+         return { success: false, error: "Invalid data format" };
        }
        const record = data as Record<string, unknown>;
-       if (typeof record.markdown !== 'string') {
-         return { success: false, error: 'Missing markdown field' };
+       if (typeof record.markdown !== "string") {
+         return { success: false, error: "Missing markdown field" };
        }
        return { success: true, data: { markdown: record.markdown } };
      },
-     exporters: [{ format: 'png', loader: () => import('./exporters/png') }],
+     exporters: [{ format: "png", loader: () => import("./exporters/png") }],
    };
    ```
 
@@ -166,7 +166,9 @@ Follow these steps in order. Do not skip.
        <ToolCanvas
          canvasRef={canvasRef}
          state={tool.state.data}
-         onChange={(md) => tool.state.setData((prev) => ({ ...prev, markdown: md }))}
+         onChange={(md) =>
+           tool.state.setData((prev) => ({ ...prev, markdown: md }))
+         }
        />
      }
      statusBar={<span>{tool.state.data.markdown.length} chars</span>}
@@ -175,12 +177,12 @@ Follow these steps in order. Do not skip.
 6. Update `src/tool/template-metadata.ts` — set locale and language:
    ```ts
    export const templateMetadata = {
-     htmlLang: 'en',
-     locale: 'en_US',
+     htmlLang: "en",
+     locale: "en_US",
      appName: toolConfig.name,
      shortName: toolConfig.name,
      appDescription: toolConfig.description,
-     iconPath: '/icon.svg',
+     iconPath: "/icon.svg",
    };
    ```
 7. Replace `public/og.svg` — your tool's Open Graph image.
@@ -277,7 +279,9 @@ type ImportResult =
 `tool.deserialize(data)` receives the parsed `content` object and must return:
 
 ```ts
-type DeserializeResult<T> = { success: true; data: T } | { success: false; error: string };
+type DeserializeResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
 ```
 
 ## Scripts

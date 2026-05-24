@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import '@itsjust/core/styles.css';
+@import "tailwindcss";
+@import "@itsjust/core/styles.css";
 
 :root {
   --background: #f1f5f9;
@@ -29,7 +29,7 @@
   --color-foreground: var(--foreground);
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   --background: #0f1219;
   --foreground: #e2e8f0;
   --accent: #5b9cf6;
@@ -51,7 +51,7 @@
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
-[data-contrast='more'] {
+[data-contrast="more"] {
   --background: #ffffff;
   --foreground: #000000;
   --muted: #111111;
@@ -70,7 +70,7 @@
   --error-hover: #670000;
 }
 
-[data-theme='dark'][data-contrast='more'] {
+[data-theme="dark"][data-contrast="more"] {
   --background: #000000;
   --foreground: #ffffff;
   --muted: #f0f0f0;
@@ -105,7 +105,7 @@ body {
     var(--font-geist-sans),
     system-ui,
     -apple-system,
-    'Segoe UI',
+    "Segoe UI",
     sans-serif;
   margin: 0;
   padding: 0;
@@ -546,7 +546,8 @@ body {
   border: none;
   outline: none;
   resize: none;
-  font-family: ui-monospace, Menlo, Monaco, 'Cascadia Code', 'Segoe UI Mono', monospace;
+  font-family:
+    ui-monospace, Menlo, Monaco, "Cascadia Code", "Segoe UI Mono", monospace;
   line-height: 1.6;
   caret-color: var(--accent);
 }
@@ -703,7 +704,7 @@ body {
     color: #000 !important;
     padding: 1rem !important;
     font-family:
-      ui-monospace, Menlo, Monaco, 'Cascadia Code', 'Segoe UI Mono', monospace !important;
+      ui-monospace, Menlo, Monaco, "Cascadia Code", "Segoe UI Mono", monospace !important;
     line-height: 1.6 !important;
     white-space: pre-wrap !important;
     word-break: break-word !important;

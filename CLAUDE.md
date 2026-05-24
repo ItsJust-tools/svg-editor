@@ -99,7 +99,9 @@ type ImportResult =
 **`DeserializeResult<T>` (Discriminated Union):**
 
 ```ts
-type DeserializeResult<T> = { success: true; data: T } | { success: false; error: string };
+type DeserializeResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
 ```
 
 **`ExportResult`:**
@@ -140,9 +142,13 @@ exporters: [
 Alles läuft im Browser — kein Server, keine API-Calls:
 
 ```tsx
-const { exportTo, supportedFormats, isExporting } = useExport(canvasRef, toolConfig, serialize);
+const { exportTo, supportedFormats, isExporting } = useExport(
+  canvasRef,
+  toolConfig,
+  serialize,
+);
 const { importFromFile } = useImport({
-  acceptedFormats: ['json'],
+  acceptedFormats: ["json"],
   maxFileSize: 5 * 1024 * 1024, // optional, default: 5MB
   onImport: (result) => {
     if (result.success) {
@@ -153,7 +159,7 @@ const { importFromFile } = useImport({
 });
 
 // Export
-exportTo('png'); // oder jpeg, webp, pdf, json
+exportTo("png"); // oder jpeg, webp, pdf, json
 
 // Import via File Input
 <input
@@ -191,12 +197,12 @@ Provides undo/redo, auto-save, dirty state:
 
 ```tsx
 const state = useToolState<NotepadState>(initialState, {
-  key: 'my-tool',
+  key: "my-tool",
   maxHistory: 50,
   autoSaveDelay: 1000,
 });
 
-state.setData((prev) => ({ ...prev, text: 'new' }));
+state.setData((prev) => ({ ...prev, text: "new" }));
 state.undo();
 state.redo();
 state.saveNow();
@@ -207,8 +213,12 @@ state.saveNow();
 Client-side export via `useExport`:
 
 ```tsx
-const { exportTo, supportedFormats, isExporting } = useExport(canvasRef, toolConfig, serialize);
-exportTo('png'); // or jpeg, webp, pdf, json
+const { exportTo, supportedFormats, isExporting } = useExport(
+  canvasRef,
+  toolConfig,
+  serialize,
+);
+exportTo("png"); // or jpeg, webp, pdf, json
 ```
 
 ### Share System (100% Client-Side)
@@ -220,16 +230,16 @@ const { downloadShareFile, shareViaWeb } = useShare();
 
 // Download als .itsjust.json Datei
 await downloadShareFile({
-  toolId: 'my-tool',
+  toolId: "my-tool",
   content: serialize(),
-  metadata: { schemaVersion: '1.0' },
+  metadata: { schemaVersion: "1.0" },
 });
 
 // Web Share API (System-Dialog)
 await shareViaWeb({
-  toolId: 'my-tool',
+  toolId: "my-tool",
   content: serialize(),
-  metadata: { schemaVersion: '1.0' },
+  metadata: { schemaVersion: "1.0" },
 });
 
 // Share URL mit serialisiertem State
