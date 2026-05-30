@@ -73,7 +73,7 @@ export function useExport(
     }
     const timer = setTimeout(preload, 250);
     return () => clearTimeout(timer);
-  }, [config.exportFormats]);
+  }, [config.exportFormats, engine]);
 
   useEffect(() => {
     if (missing.length === 0 || hasWarnedRef.current) return;
@@ -141,7 +141,7 @@ export function useExport(
         abortControllerRef.current = null;
       }
     },
-    [canvasRef, stateSerializer],
+    [canvasRef, stateSerializer, engine],
   );
 
   return {
