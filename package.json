@@ -1,7 +1,13 @@
 {
   "name": "svg-editor",
   "version": "1.4.0",
+  "description": "Full visual SVG editor with shape tools, text support, and bi-directional code sync. Edit on canvas or in code, export clean SVG.",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ItsJust-tools/svg-editor.git"
+  },
   "workspaces": [
     "packages/*"
   ],
