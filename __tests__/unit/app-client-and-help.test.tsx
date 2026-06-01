@@ -57,7 +57,7 @@ vi.mock("@itsjust/core", () => ({
   ),
   useTool: () => ({
     state: {
-      data: { svg: '<svg><!-- test --></svg>', title: 'Test' },
+      data: { svg: "<svg><!-- test --></svg>", title: "Test" },
       setData: mockSetData,
       isDirty: false,
       lastSaved: "just now",
@@ -85,7 +85,7 @@ vi.mock("@/tool", () => ({
     deserialize: () => ({ success: true, data: { text: "From Shared Url" } }),
   },
   ToolCanvas: ({ svg }: { svg?: string }) => <div>canvas:{svg}</div>,
-  ToolToolbar: ({ onInsertShape }: { onInsertShape?: (s: string) => void }) => <div>toolbar</div>,
+  ToolToolbar: () => <div>toolbar</div>,
   ToolSidebar: ({ svg }: { svg?: string }) => <div>sidebar:{svg}</div>,
 }));
 

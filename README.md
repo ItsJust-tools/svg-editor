@@ -53,13 +53,13 @@ src/
 
 ## Scripts
 
-| Command              | Description                    |
-| -------------------- | ------------------------------ |
-| `npm run dev`        | Start dev server (Turbopack)   |
-| `npm run build`      | Build core package + Next.js   |
-| `npm test`           | Run Vitest unit tests          |
-| `npm run lint`       | Run ESLint                     |
-| `npm run format`     | Format with Prettier           |
+| Command          | Description                  |
+| ---------------- | ---------------------------- |
+| `npm run dev`    | Start dev server (Turbopack) |
+| `npm run build`  | Build core package + Next.js |
+| `npm test`       | Run Vitest unit tests        |
+| `npm run lint`   | Run ESLint                   |
+| `npm run format` | Format with Prettier         |
 
 ## License
 
