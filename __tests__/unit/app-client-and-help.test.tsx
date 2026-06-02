@@ -73,16 +73,19 @@ vi.mock("@itsjust/core", () => ({
 
 vi.mock("@/tool", () => ({
   toolConfig: {
-    id: "simple-notepad",
-    name: "Notepad",
+    id: "svg-editor",
+    name: "SVG Editor",
     version: "1.0.0",
     features: { sidebar: true },
-    theme: { brand: "Notepad" },
+    theme: { brand: "SVG Editor" },
   },
   templateBaseVersion: "1.1.0",
-  svgEditorTool: {
+  toolDefinition: {
     serialize: (state: unknown) => JSON.stringify(state),
-    deserialize: () => ({ success: true, data: { text: "From Shared Url" } }),
+    deserialize: () => ({
+      success: true,
+      data: { svg: "<svg></svg>" },
+    }),
   },
   ToolCanvas: ({ svg }: { svg?: string }) => <div>canvas:{svg}</div>,
   ToolToolbar: () => <div>toolbar</div>,

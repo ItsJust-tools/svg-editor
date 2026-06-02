@@ -9,19 +9,15 @@ import {
 import {
   toolConfig,
   templateBaseVersion,
-  notepadTool,
+  toolDefinition,
   ToolCanvas,
   ToolToolbar,
   ToolSidebar,
 } from "@/tool";
 
-const DEFAULT_FONT_SIZE = 16;
-const MIN_FONT_SIZE = 8;
-const MAX_FONT_SIZE = 72;
-
 export default function ToolClient() {
   const canvasRef = useRef<HTMLDivElement>(null);
-  const tool = useTool(notepadTool, canvasRef);
+  const tool = useTool(toolDefinition, canvasRef);
   const setToolData = tool.state.setData;
   const showToast = tool.toast;
   const [isSharing, setIsSharing] = useState(false);
@@ -32,8 +28,6 @@ export default function ToolClient() {
       window.innerWidth > 768 &&
       toolConfig.features.sidebar,
   );
-  const [fontSize, setFontSize] = useState(DEFAULT_FONT_SIZE);
-
   const title = tool.state.data.title?.trim() || toolConfig.name;
   const [isEditingBrand, setIsEditingBrand] = useState(false);
   const [editValue, setEditValue] = useState(title);
@@ -42,18 +36,52 @@ export default function ToolClient() {
     document.title = title;
   }, [title]);
 
-  const handleTextChange = useCallback(
-    (text: string) => {
-      setToolData((prev) => ({ ...prev, text }));
+  const handleSvgChange = useCallback(
+    (svg: string) => {
+      setToolData((prev) => ({ ...prev, svg }));
     },
     [setToolData],
   );
 
-  const handleFontSizeChange = useCallback((delta: number) => {
-    setFontSize((prev) =>
-      Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, prev + delta)),
-    );
-  }, []);
+  const handleInsertShape = useCallback(
+    (shape: string) => {
+      const svg = tool.state.data.svg;
+      // Find the closing tag of the root SVG element
+      const svgCloseMatch = svg.lastIndexOf("</svg>");
+      if (svgCloseMatch === -1) return;
+
+      let shapeSvg = "";
+      const id = `shape-${Date.now()}`;
+      switch (shape) {
+        case "rect":
+          shapeSvg = `  <rect id="${id}" x="10" y="10" width="80" height="60" rx="4" fill="#3b82f6" />\n`;
+          break;
+        case "circle":
+          shapeSvg = `  <circle id="${id}" cx="50" cy="50" r="40" fill="#ef4444" />\n`;
+          break;
+        case "ellipse":
+          shapeSvg = `  <ellipse id="${id}" cx="50" cy="50" rx="60" ry="30" fill="#8b5cf6" />\n`;
+          break;
+        case "path":
+          shapeSvg = `  <path id="${id}" d="M10 80 Q 52.5 10, 95 80 T 180 80" fill="none" stroke="#10b981" stroke-width="3" />\n`;
+          break;
+        case "text":
+          shapeSvg = `  <text id="${id}" x="40" y="55" font-family="sans-serif" font-size="16" fill="#1f2937">Hello</text>\n`;
+          break;
+        case "line":
+          shapeSvg = `  <line id="${id}" x1="10" y1="10" x2="90" y2="90" stroke="#f59e0b" stroke-width="3" />\n`;
+          break;
+        default:
+          return;
+      }
+
+      const newSvg =
+        svg.slice(0, svgCloseMatch) + shapeSvg + svg.slice(svgCloseMatch);
+      setToolData((prev) => ({ ...prev, svg: newSvg }));
+      showToast(`Inserted ${shape}`, "success");
+    },
+    [tool.state.data.svg, setToolData, showToast],
+  );
 
   useEffect(() => {
     if (hasLoadedSharedState.current) return;
@@ -65,7 +93,7 @@ export default function ToolClient() {
       const serialized = decompressFromEncodedURIComponent(encodedState);
       if (!serialized) throw new Error("Invalid shared URL");
       const parsed: unknown = JSON.parse(serialized);
-      const deserialized = notepadTool.deserialize(parsed);
+      const deserialized = toolDefinition.deserialize(parsed);
       if (!deserialized.success) throw new Error(deserialized.error);
       setToolData(deserialized.data);
       showToast("Loaded state from shared URL", "success");
@@ -79,7 +107,7 @@ export default function ToolClient() {
   const handleShare = useCallback(async () => {
     setIsSharing(true);
     try {
-      const serialized = notepadTool.serialize(tool.state.data);
+      const serialized = toolDefinition.serialize(tool.state.data);
       const encodedState = compressToEncodedURIComponent(serialized);
       if (!encodedState) throw new Error("Failed to encode state for URL");
       const url = new URL(window.location.href);
@@ -133,7 +161,7 @@ export default function ToolClient() {
 
   const toolbarContent = (
     <>
-      <ToolToolbar />
+      <ToolToolbar onInsertShape={handleInsertShape} />
       <ImportExport
         formats={tool.supportedFormats}
         onExport={tool.handleExport}
@@ -145,20 +173,13 @@ export default function ToolClient() {
     </>
   );
 
-  const sidebarContent = (
-    <ToolSidebar
-      text={tool.state.data.text}
-      fontSize={fontSize}
-      onFontSizeChange={handleFontSizeChange}
-    />
-  );
+  const sidebarContent = <ToolSidebar svg={tool.state.data.svg} />;
 
   const canvasContent = (
     <ToolCanvas
       canvasRef={canvasRef}
-      text={tool.state.data.text}
-      fontSize={fontSize}
-      onChange={handleTextChange}
+      svg={tool.state.data.svg}
+      onChange={handleSvgChange}
     />
   );
 
@@ -178,7 +199,9 @@ export default function ToolClient() {
           "Ready"
         )}
       </span>
-      <span className="status-slot status-slot-font-size">{fontSize}px</span>
+      <span className="status-slot status-slot-svg-size">
+        {tool.state.data.svg.length.toLocaleString()} chars
+      </span>
       <span className="status-slot status-slot-tool-version">
         Tool v{toolConfig.version}
       </span>

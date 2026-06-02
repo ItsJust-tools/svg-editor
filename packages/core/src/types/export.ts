@@ -39,4 +39,5 @@ export const formatLabels = {
   webp: "WebP Image",
   pdf: "PDF Document",
   json: "JSON Data",
+  svg: "SVG Image",
 } satisfies Record<ExportFormat, string>;

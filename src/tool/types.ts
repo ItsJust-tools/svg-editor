@@ -1,4 +1,4 @@
-export interface NotepadState {
-  text: string;
+export interface SvgEditorState {
+  svg: string;
   title?: string;
 }

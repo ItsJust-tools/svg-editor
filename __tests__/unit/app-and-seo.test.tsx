@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { generateJsonLd, generateToolMetadata } from "@/lib/seo";
 import toolConfig from "@/tool/tool.config";
 import { getPublicSiteUrl, templateMetadata } from "@/tool/template-metadata";
-import { notepadTool } from "@/tool/tool-definition";
+import { toolDefinition } from "@/tool/tool-definition";
 import { ToolCanvas } from "@/tool/components/tool-canvas";
 import { ToolSidebar } from "@/tool/components/tool-sidebar";
 import { ToolToolbar } from "@/tool/components/tool-toolbar";
@@ -112,48 +112,60 @@ describe("app and seo", () => {
   it("covers tool definition and helper exports", async () => {
     expect(cn("a", undefined, "b", false, null, "c")).toBe("a b c");
     expect(getPublicSiteUrl()).toBe("http://localhost:3000");
-    expect(notepadTool.deserialize({ text: "x" })).toEqual({
+    expect(
+      toolDefinition.deserialize({
+        svg: "<svg><rect /></svg>",
+      }),
+    ).toEqual({
       success: true,
-      data: { text: "x" },
+      data: { svg: "<svg><rect /></svg>" },
     });
-    expect(notepadTool.deserialize({ nope: true })).toEqual({
+    expect(toolDefinition.deserialize({ nope: true })).toEqual({
       success: false,
-      error: "Invalid data format: expected { text: string, title?: string }",
+      error: "Invalid data format: expected { svg: string, title?: string }",
     });
-    expect(notepadTool.serialize({ text: "x" })).toContain('"text": "x"');
-    expect(notepadTool.deserialize({ text: "x", title: "My Note" })).toEqual({
+    expect(toolDefinition.serialize({ svg: "<svg><rect /></svg>" })).toContain(
+      '"svg": "<svg><rect /></svg>"',
+    );
+    expect(
+      toolDefinition.deserialize({
+        svg: "<svg></svg>",
+        title: "My SVG",
+      }),
+    ).toEqual({
       success: true,
-      data: { text: "x", title: "My Note" },
+      data: { svg: "<svg></svg>", title: "My SVG" },
     });
-    const exporters = notepadTool.exporters ?? [];
-    expect(exporters).toHaveLength(4);
+    const exporters = toolDefinition.exporters ?? [];
+    expect(exporters).toHaveLength(5);
     const first = exporters[0];
     expect(first).toBeDefined();
     if (!first) throw new Error("missing exporter");
-    const png = await (first.loader as ExporterLoader)();
-    const resolved = "default" in png ? png.default : png.exporter;
-    expect(resolved.format).toBe("png");
+    const svgResult = await (first.loader as ExporterLoader)();
+    const resolved =
+      "default" in svgResult ? svgResult.default : svgResult.exporter;
+    expect(resolved.format).toBe("svg");
   });
 
   it("renders tool components", () => {
+    const testSvg =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50"><rect x="10" y="10" width="80" height="30" fill="blue" /></svg>';
+
     render(
       <>
         <ToolToolbar />
-        <ToolSidebar
-          text="Hello world"
-          fontSize={16}
-          onFontSizeChange={() => {}}
-        />
-        <ToolCanvas text="" fontSize={16} />
+        <ToolSidebar svg={testSvg} />
+        <ToolCanvas svg={testSvg} />
       </>,
     );
 
     expect(
       screen.getByRole("link", { name: "Open help page" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("11")).toBeInTheDocument(); // char count for "Hello world"
     expect(
-      screen.getByRole("application", { name: "Notepad canvas" }),
+      screen.getByRole("application", { name: "SVG Editor canvas" }),
     ).toBeInTheDocument();
+    expect(screen.getByText("Code Editor")).toBeInTheDocument();
+    expect(screen.getByText("Preview")).toBeInTheDocument();
   });
 });
