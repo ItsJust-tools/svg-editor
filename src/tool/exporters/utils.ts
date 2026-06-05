@@ -6,6 +6,10 @@ import type {
 } from "@itsjust/core";
 import { toBlob } from "html-to-image";
 
+/**
+ * Formats an export error into a user-friendly message.
+ * Provides a specific CORS hint when the error matches known cross-origin patterns.
+ */
 export function formatExportError(error: unknown, format: string): string {
   const base =
     error instanceof Error ? error.message : `${format} export failed`;
@@ -16,28 +20,47 @@ export function formatExportError(error: unknown, format: string): string {
   return base;
 }
 
+/**
+ * Throws an AbortError DOMException if the provided AbortSignal has been aborted.
+ * Used to bail out of export pipelines when the user cancels the operation.
+ */
 export function throwIfAborted(signal?: AbortSignal): void {
   if (signal?.aborted) {
     throw new DOMException("Export aborted", "AbortError");
   }
 }
 
+/** Saved style property to be restored after export. */
 interface SavedStyle {
   el: HTMLElement;
   prop: string;
   value: string;
 }
 
+/**
+ * Saves an element's current style value so it can be restored later.
+ */
 function saveStyle(saved: SavedStyle[], el: HTMLElement, prop: string) {
   saved.push({ el, prop, value: el.style.getPropertyValue(prop) });
 }
 
+/**
+ * Restores previously saved style properties in reverse order.
+ */
 function restoreStyles(saved: SavedStyle[]) {
   for (const { el, prop, value } of saved.reverse()) {
     el.style.setProperty(prop, value);
   }
 }
 
+/**
+ * Renders an HTML element to a canvas by temporarily moving it off-screen
+ * and capturing it via html-to-image. The element is returned to its original
+ * DOM position after capture.
+ *
+ * This handles textareas by expanding them to full scroll height so content
+ * isn't clipped during the rasterization pass.
+ */
 export async function renderToImage(
   element: HTMLElement,
   options: ExportOptions,
@@ -153,6 +176,10 @@ export async function renderToImage(
   }
 }
 
+/**
+ * Factory function that creates an Exporter for raster image formats (PNG, JPEG, WebP).
+ * Handles the full export pipeline: render-to-canvas, encode-to-blob, and error wrapping.
+ */
 export function createCanvasExporter(
   format: ExportFormat,
   mimeType: "image/png" | "image/jpeg" | "image/webp",

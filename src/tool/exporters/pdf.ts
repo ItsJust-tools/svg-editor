@@ -1,6 +1,10 @@
 import type { Exporter } from "@itsjust/core";
 import { formatExportError, throwIfAborted } from "./utils";
 
+/**
+ * Collects all stylesheet CSS rules into a single string.
+ * Cross-origin stylesheets are silently skipped (read access denied).
+ */
 function collectStyles(): string {
   const chunks: string[] = [];
   for (let i = 0; i < document.styleSheets.length; i++) {
@@ -20,6 +24,12 @@ function collectStyles(): string {
   return chunks.join("\n");
 }
 
+/**
+ * Creates a printable clone of the element, replacing textareas with
+ * plain div elements so the print dialog renders content consistently.
+ * Computed font/color styles from the original textarea are preserved
+ * on the replacement div.
+ */
 function createPrintClone(element: HTMLElement): string {
   const clone = element.cloneNode(true) as HTMLElement;
 

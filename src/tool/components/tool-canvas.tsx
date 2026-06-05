@@ -9,15 +9,21 @@ interface ToolCanvasProps {
   onChange?: (svg: string) => void;
 }
 
+/**
+ * Main SVG editor canvas with a code editor tab and a live preview tab.
+ * Provides copy/download buttons for the SVG source and renders the
+ * preview inside a sandboxed iframe.
+ */
 export function ToolCanvas({
   svg,
   readOnly = false,
   canvasRef,
   onChange,
 }: ToolCanvasProps) {
-  const [svgError, setSvgError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"editor" | "preview">("editor");
+  const [svgError, setSvgError] = useState<string | null>(null);
 
+  /** Clear error when SVG changes */
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setSvgError(null);
@@ -28,6 +34,7 @@ export function ToolCanvas({
 
   const previewHtml = useMemo(() => {
     // Wrap SVG in an HTML document for the iframe preview
+    // Use the system background color so dark mode is respected
     return `<!DOCTYPE html>
 <html><body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8fafc;">
 ${svg}

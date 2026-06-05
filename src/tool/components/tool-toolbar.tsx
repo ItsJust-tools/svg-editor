@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 
 interface ToolToolbarProps {
   onInsertShape?: (shape: string) => void;
@@ -77,13 +76,13 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
 
       <div className="toolbar-separator" />
 
-      <Link
+      <a
         href="/help"
         className="toolbar-btn toolbar-help-link"
         aria-label="Open help page"
       >
         Help
-      </Link>
+      </a>
     </div>
   );
 }

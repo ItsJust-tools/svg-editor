@@ -7,6 +7,9 @@ const DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 20
   <circle cx="100" cy="100" r="40" fill="#fbbf24" />
 </svg>`;
 
+/**
+ * Type guard that checks whether an unknown value is a valid SvgEditorState.
+ */
 function isSvgEditorState(value: unknown): value is SvgEditorState {
   if (typeof value !== "object" || value === null) return false;
   const v = value as { svg?: unknown; title?: unknown };
@@ -16,6 +19,10 @@ function isSvgEditorState(value: unknown): value is SvgEditorState {
   );
 }
 
+/**
+ * Tool definition for the SVG Editor — wires up state management, serialization,
+ * and lazy-loaded exporters for SVG, PNG, JPEG, WebP, and PDF formats.
+ */
 export const toolDefinition: Tool<SvgEditorState> = {
   id: toolConfig.id,
   name: toolConfig.name,
