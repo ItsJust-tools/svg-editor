@@ -57,10 +57,18 @@ function countColors(svg: string): {
   return { fills, strokes };
 }
 
+/**
+ * Sidebar panel displaying SVG metadata: viewBox dimensions, element counts,
+ * unique color palette for fills and strokes. Handles empty SVGs gracefully
+ * by showing zeroed-out stats.
+ */
 export function ToolSidebar({ svg }: ToolSidebarProps) {
   const viewBox = useMemo(() => parseViewBox(svg), [svg]);
-  const elements = useMemo(() => countElements(svg), [svg]);
-  const { fills, strokes } = useMemo(() => countColors(svg), [svg]);
+  const elements = useMemo(() => (svg.trim() ? countElements(svg) : {}), [svg]);
+  const { fills, strokes } = useMemo(
+    () => (svg.trim() ? countColors(svg) : { fills: new Set<string>(), strokes: new Set<string>() }),
+    [svg],
+  );
 
   const totalElements = useMemo(
     () => Object.values(elements).reduce((sum, c) => sum + c, 0),

@@ -7,7 +7,10 @@ interface ToolToolbarProps {
 
 /**
  * Toolbar for the SVG Editor — provides shape insertion buttons and a help link.
- * All shape buttons are only rendered when onInsertShape is provided.
+ * All shape buttons are only rendered when `onInsertShape` is provided.
+ *
+ * @param props.onInsertShape - Callback invoked with the shape name when a
+ *   shape button is clicked. When omitted, shape insertion buttons are hidden.
  */
 export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
   return (

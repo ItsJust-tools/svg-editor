@@ -1,12 +1,38 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ToolCanvasProps {
   svg: string;
   readOnly?: boolean;
   canvasRef?: React.RefObject<HTMLDivElement | null>;
   onChange?: (svg: string) => void;
+}
+
+/**
+ * Resolves the effective background color for the preview iframe by reading
+ * the computed `--preview-bg` CSS variable (or the element's own background).
+ * Falls back to `#f8fafc` when the value cannot be determined.
+ */
+function getPreviewBackground(container: HTMLElement | null): string {
+  if (!container) return "#f8fafc";
+  const style = getComputedStyle(container);
+  return style.getPropertyValue("--preview-bg").trim() || "#f8fafc";
+}
+
+/**
+ * Builds an HTML document string wrapping the given SVG for display in
+ * a sandboxed iframe preview pane.
+ *
+ * @param svg - The raw SVG markup to render.
+ * @param bgColor - Background color to apply to the preview body.
+ * @returns A complete HTML document string.
+ */
+function buildPreviewHtml(svg: string, bgColor: string): string {
+  return `<!DOCTYPE html>
+<html><body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:${bgColor};">
+${svg}
+</body></html>`;
 }
 
 /**
@@ -22,6 +48,7 @@ export function ToolCanvas({
 }: ToolCanvasProps) {
   const [activeTab, setActiveTab] = useState<"editor" | "preview">("editor");
   const [svgError, setSvgError] = useState<string | null>(null);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
 
   /** Clear error when SVG changes */
   const handleChange = useCallback(
@@ -32,14 +59,20 @@ export function ToolCanvas({
     [onChange],
   );
 
-  const previewHtml = useMemo(() => {
-    // Wrap SVG in an HTML document for the iframe preview
-    // Use the system background color so dark mode is respected
-    return `<!DOCTYPE html>
-<html><body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f8fafc;">
-${svg}
-</body></html>`;
-  }, [svg]);
+  /**
+   * Generates an HTML document wrapping the SVG for the iframe preview.
+   * Reads the container's current effective background so dark mode and
+   * high-contrast themes are accurately reflected.
+   */
+  const [previewHtml, setPreviewHtml] = useState(() =>
+    buildPreviewHtml(svg, "#f8fafc"),
+  );
+
+  // Rebuild preview HTML on svg change, using the current effective background
+  useEffect(() => {
+    const bg = getPreviewBackground(previewContainerRef.current);
+    setPreviewHtml(buildPreviewHtml(svg, bg));
+  }, [svg, activeTab]);
 
   const handleCopySvg = useCallback(async () => {
     try {
@@ -149,7 +182,11 @@ ${svg}
             <span className="svg-editor-preview-error">{svgError}</span>
           )}
         </div>
-        <div className="svg-editor-preview-container">
+        <div
+          ref={previewContainerRef}
+          className="svg-editor-preview-container"
+          style={{ "--preview-bg": "var(--card)" } as React.CSSProperties}
+        >
           {svg ? (
             <iframe
               className="svg-editor-preview-iframe"
