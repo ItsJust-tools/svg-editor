@@ -180,6 +180,7 @@ export default function ToolClient() {
       canvasRef={canvasRef}
       svg={tool.state.data.svg}
       onChange={handleSvgChange}
+      onError={(msg) => showToast(msg, "error")}
     />
   );
 

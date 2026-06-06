@@ -1,9 +1,22 @@
 "use client";
 
+import { useCallback, useEffect } from "react";
 
 interface ToolToolbarProps {
   onInsertShape?: (shape: string) => void;
 }
+
+/**
+ * Shape-to-key mapping for keyboard shortcut hints.
+ */
+const SHAPE_SHORTCUTS: Record<string, string> = {
+  rect: "R",
+  circle: "C",
+  ellipse: "E",
+  path: "P",
+  text: "T",
+  line: "L",
+};
 
 /**
  * Toolbar for the SVG Editor — provides shape insertion buttons and a help link.
@@ -13,6 +26,34 @@ interface ToolToolbarProps {
  *   shape button is clicked. When omitted, shape insertion buttons are hidden.
  */
 export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
+  // Keyboard shortcuts for shape insertion
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!onInsertShape) return;
+      // Ignore if user is typing in an input/textarea
+      const tag =
+        (e.target as HTMLElement)?.tagName?.toLowerCase() || "";
+      if (tag === "input" || tag === "textarea" || tag === "select") return;
+
+      // Alt+key shortcuts for shapes
+      if (!e.altKey) return;
+      const key = e.key.toLowerCase();
+      for (const [shape, shortcut] of Object.entries(SHAPE_SHORTCUTS)) {
+        if (key === shortcut.toLowerCase()) {
+          e.preventDefault();
+          onInsertShape(shape);
+          return;
+        }
+      }
+    },
+    [onInsertShape],
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
+
   return (
     <div className="svg-editor-toolbar-items">
       <span className="toolbar-hint">SVG Code Editor</span>
@@ -24,7 +65,7 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
             type="button"
             className="toolbar-btn"
             onClick={() => onInsertShape("rect")}
-            title="Insert rectangle"
+            title="Insert rectangle (Alt+R)"
             aria-label="Insert rectangle"
           >
             Rect
@@ -33,7 +74,7 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
             type="button"
             className="toolbar-btn"
             onClick={() => onInsertShape("circle")}
-            title="Insert circle"
+            title="Insert circle (Alt+C)"
             aria-label="Insert circle"
           >
             Circle
@@ -42,7 +83,7 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
             type="button"
             className="toolbar-btn"
             onClick={() => onInsertShape("ellipse")}
-            title="Insert ellipse"
+            title="Insert ellipse (Alt+E)"
             aria-label="Insert ellipse"
           >
             Ellipse
@@ -51,7 +92,7 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
             type="button"
             className="toolbar-btn"
             onClick={() => onInsertShape("path")}
-            title="Insert path"
+            title="Insert path (Alt+P)"
             aria-label="Insert path"
           >
             Path
@@ -60,7 +101,7 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
             type="button"
             className="toolbar-btn"
             onClick={() => onInsertShape("text")}
-            title="Insert text"
+            title="Insert text (Alt+T)"
             aria-label="Insert text"
           >
             Text
@@ -69,7 +110,7 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
             type="button"
             className="toolbar-btn"
             onClick={() => onInsertShape("line")}
-            title="Insert line"
+            title="Insert line (Alt+L)"
             aria-label="Insert line"
           >
             Line

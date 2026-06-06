@@ -7,6 +7,8 @@ interface ToolCanvasProps {
   readOnly?: boolean;
   canvasRef?: React.RefObject<HTMLDivElement | null>;
   onChange?: (svg: string) => void;
+  /** Callback invoked when an error occurs (e.g. copy failure) */
+  onError?: (message: string) => void;
 }
 
 /**
@@ -45,6 +47,7 @@ export function ToolCanvas({
   readOnly = false,
   canvasRef,
   onChange,
+  onError,
 }: ToolCanvasProps) {
   const [activeTab, setActiveTab] = useState<"editor" | "preview">("editor");
   const [svgError, setSvgError] = useState<string | null>(null);
@@ -78,9 +81,9 @@ export function ToolCanvas({
     try {
       await navigator.clipboard.writeText(svg);
     } catch {
-      // Fallback silently
+      onError?.("Failed to copy SVG code to clipboard");
     }
-  }, [svg]);
+  }, [svg, onError]);
 
   const handleDownloadSvg = useCallback(() => {
     const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });

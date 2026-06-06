@@ -133,26 +133,54 @@ export function ToolSidebar({ svg }: ToolSidebarProps) {
       {(fills.size > 0 || strokes.size > 0) && (
         <div className="sidebar-section">
           <h3>Colors Used</h3>
-          <dl className="stats-list">
+          <div className="sidebar-colors-list">
             {fills.size > 0 && (
-              <div className="sidebar-colors">
-                <dt>Fills</dt>
-                {[...fills].slice(0, 8).map((color) => (
-                  <div className="color-swatch-row" key={color}>
+              <div className="sidebar-color-group">
+                <span className="sidebar-color-label">Fills</span>
+                <div className="sidebar-colors-grid">
+                  {[...fills].slice(0, 12).map((color) => (
                     <span
-                      className="color-swatch"
-                      style={{ backgroundColor: color }}
+                      key={`fill-${color}`}
+                      className="color-swatch-item"
                       title={color}
-                    />
-                    <span className="color-swatch-label">{color}</span>
-                  </div>
-                ))}
-                {fills.size > 8 && (
-                  <dd className="color-more">+{fills.size - 8} more</dd>
-                )}
+                    >
+                      <span
+                        className="color-swatch"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="color-swatch-label">{color}</span>
+                    </span>
+                  ))}
+                  {fills.size > 12 && (
+                    <span className="color-more">+{fills.size - 12} more</span>
+                  )}
+                </div>
               </div>
             )}
-          </dl>
+            {strokes.size > 0 && (
+              <div className="sidebar-color-group">
+                <span className="sidebar-color-label">Strokes</span>
+                <div className="sidebar-colors-grid">
+                  {[...strokes].slice(0, 12).map((color) => (
+                    <span
+                      key={`stroke-${color}`}
+                      className="color-swatch-item"
+                      title={color}
+                    >
+                      <span
+                        className="color-swatch"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="color-swatch-label">{color}</span>
+                    </span>
+                  ))}
+                  {strokes.size > 12 && (
+                    <span className="color-more">+{strokes.size - 12} more</span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
