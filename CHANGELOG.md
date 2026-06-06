@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Keyboard shortcuts table in README**: Documented all available shortcuts (shape insertion Alt+ shortcuts, Ctrl+Z/Y undo/redo, Ctrl+Shift+E export) in a reference table.
 - **SVG Editor component CSS**: Added proper styling for all `svg-editor-*` component classNames (canvas, tabs, code editor textarea, preview pane, mini-toolbar, buttons) with responsive mobile adjustments.
 - **Stroke colors in sidebar**: ToolSidebar now displays stroke colors alongside fill colors, with grouped display and a limit of 12 colors per group before showing "+N more".
 - **Keyboard shortcuts for shape insertion**: Alt+R (rect), Alt+C (circle), Alt+E (ellipse), Alt+P (path), Alt+T (text), Alt+L (line) — shown in button tooltips.

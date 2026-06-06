@@ -19,7 +19,7 @@ A full visual SVG editor built with Next.js. Write and preview SVG code side-by-
 - **Dark/Light Mode** — With system preference detection
 - **High Contrast Mode** — With manual toggle and system preference support
 - **Shareable URLs** — Share your SVG designs via compressed URL state
-- **Keyboard Shortcuts** — Quick access to undo, redo, and export
+- **Keyboard Shortcuts** — Shape insertion, undo/redo, and export — all at your fingertips
 - **Privacy-first** — All processing happens in your browser; nothing is sent to any server
 
 ## Compatibility
@@ -41,6 +41,22 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to start editing SVGs.
+
+## Keyboard Shortcuts
+
+| Shortcut              | Action                         |
+| --------------------- | ------------------------------ |
+| `Alt` + `R`          | Insert rectangle               |
+| `Alt` + `C`          | Insert circle                  |
+| `Alt` + `E`          | Insert ellipse                 |
+| `Alt` + `P`          | Insert path                    |
+| `Alt` + `T`          | Insert text                    |
+| `Alt` + `L`          | Insert line                    |
+| `Ctrl` + `Z`         | Undo                           |
+| `Ctrl` + `Y`         | Redo                           |
+| `Ctrl` + `Shift` + `E` | Export current SVG          |
+
+> **Note:** Shape insertion shortcuts (`Alt+…`) only work when the focus is outside of text inputs or textareas (e.g., when the code editor is not focused).
 
 ## Project Structure
 
