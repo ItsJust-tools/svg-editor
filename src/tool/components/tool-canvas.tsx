@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { formatSvg, validateSvgSyntax } from "../svg-formatter";
 
 interface ToolCanvasProps {
   svg: string;
@@ -52,6 +53,7 @@ export function ToolCanvas({
   const [activeTab, setActiveTab] = useState<"editor" | "preview">("editor");
   const [svgError, setSvgError] = useState<string | null>(null);
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   /** Clear error when SVG changes */
   const handleChange = useCallback(
@@ -60,6 +62,23 @@ export function ToolCanvas({
       onChange?.(e.target.value);
     },
     [onChange],
+  );
+
+  /**
+   * Switch to the preview tab, validating the SVG syntax first.
+   * Errors are shown inline in the preview pane header.
+   */
+  const handleTabChange = useCallback(
+    (tab: "editor" | "preview") => {
+      if (tab === "preview") {
+        const syntaxError = validateSvgSyntax(svg);
+        setSvgError(syntaxError);
+      } else {
+        setSvgError(null);
+      }
+      setActiveTab(tab);
+    },
+    [svg],
   );
 
   /**
@@ -95,9 +114,16 @@ export function ToolCanvas({
     URL.revokeObjectURL(url);
   }, [svg]);
 
-  const handleIframeError = useCallback(() => {
-    setSvgError("Failed to render SVG preview. Check your SVG syntax.");
-  }, []);
+  const handleFormatSvg = useCallback(() => {
+    try {
+      const formatted = formatSvg(svg);
+      if (formatted !== svg) {
+        onChange?.(formatted);
+      }
+    } catch {
+      onError?.("Failed to format SVG. Check for syntax errors.");
+    }
+  }, [svg, onChange, onError]);
 
   return (
     <div
@@ -114,7 +140,7 @@ export function ToolCanvas({
           aria-selected={activeTab === "editor"}
           aria-controls="svg-editor-pane"
           className={`svg-editor-tab ${activeTab === "editor" ? "svg-editor-tab-active" : ""}`}
-          onClick={() => setActiveTab("editor")}
+          onClick={() => handleTabChange("editor")}
         >
           Code Editor
         </button>
@@ -124,7 +150,7 @@ export function ToolCanvas({
           aria-selected={activeTab === "preview"}
           aria-controls="svg-preview-pane"
           className={`svg-editor-tab ${activeTab === "preview" ? "svg-editor-tab-active" : ""}`}
-          onClick={() => setActiveTab("preview")}
+          onClick={() => handleTabChange("preview")}
         >
           Preview
         </button>
@@ -140,6 +166,15 @@ export function ToolCanvas({
         <div className="svg-editor-toolbar-mini">
           <span className="svg-editor-toolbar-label">SVG Code</span>
           <div className="svg-editor-toolbar-actions">
+            <button
+              type="button"
+              className="svg-editor-mini-btn"
+              onClick={handleFormatSvg}
+              title="Format/indent SVG code"
+              aria-label="Format SVG code"
+            >
+              Format
+            </button>
             <button
               type="button"
               className="svg-editor-mini-btn"
@@ -182,7 +217,9 @@ export function ToolCanvas({
         <div className="svg-editor-toolbar-mini">
           <span className="svg-editor-toolbar-label">Live Preview</span>
           {svgError && (
-            <span className="svg-editor-preview-error">{svgError}</span>
+            <span className="svg-editor-preview-error" role="alert">
+              {svgError}
+            </span>
           )}
         </div>
         <div
@@ -192,11 +229,11 @@ export function ToolCanvas({
         >
           {svg ? (
             <iframe
+              ref={iframeRef}
               className="svg-editor-preview-iframe"
               srcDoc={previewHtml}
               title="SVG preview"
               sandbox="allow-scripts allow-same-origin"
-              onError={handleIframeError}
             />
           ) : (
             <div className="svg-editor-preview-empty">

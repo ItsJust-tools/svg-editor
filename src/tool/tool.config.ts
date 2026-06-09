@@ -40,6 +40,46 @@ const toolConfig = {
           label: "Redo",
           description: "redo last undone action",
         },
+        {
+          keys: "Alt+Shift+F",
+          label: "Format",
+          description: "format/indent SVG code",
+        },
+      ],
+    },
+    {
+      title: "Insert Shapes",
+      shortcuts: [
+        {
+          keys: "Alt+R",
+          label: "Insert rect",
+          description: "insert a rectangle shape",
+        },
+        {
+          keys: "Alt+C",
+          label: "Insert circle",
+          description: "insert a circle shape",
+        },
+        {
+          keys: "Alt+E",
+          label: "Insert ellipse",
+          description: "insert an ellipse shape",
+        },
+        {
+          keys: "Alt+P",
+          label: "Insert path",
+          description: "insert a path element",
+        },
+        {
+          keys: "Alt+T",
+          label: "Insert text",
+          description: "insert a text element",
+        },
+        {
+          keys: "Alt+L",
+          label: "Insert line",
+          description: "insert a line element",
+        },
       ],
     },
   ],

@@ -329,6 +329,16 @@ body {
   flex-shrink: 0;
 }
 
+.color-swatch-semantic {
+  background-image: linear-gradient(45deg, var(--border) 25%, transparent 25%, transparent 75%, var(--border) 75%, var(--border)),
+    linear-gradient(45deg, var(--border) 25%, transparent 25%, transparent 75%, var(--border) 75%, var(--border));
+  background-size: 6px 6px;
+  background-position:
+    0 0,
+    3px 3px;
+  border: 1px dashed var(--muted);
+}
+
 .color-swatch-label {
   font-size: 0.6875rem;
   font-family: ui-monospace, Menlo, Monaco, monospace;
@@ -650,6 +660,12 @@ body {
   overflow: hidden;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .svg-editor-preview-iframe {
+    transition: opacity 0.15s ease;
+  }
+}
+
 .svg-editor-tabs {
   display: flex;
   gap: 0;
@@ -784,6 +800,12 @@ body {
 
 .svg-editor-textarea:focus {
   box-shadow: inset 0 0 0 1px var(--accent);
+  outline: none;
+}
+
+.svg-editor-textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .svg-editor-preview-pane {

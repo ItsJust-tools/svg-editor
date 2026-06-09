@@ -37,7 +37,34 @@ function countElements(svg: string): Record<string, number> {
 }
 
 /**
+ * Extracts color values from an SVG `style` attribute string (e.g. "fill:red;stroke:blue").
+ */
+function extractColorsFromStyle(
+  styleAttr: string,
+): { fills: string[]; strokes: string[] } {
+  const fills: string[] = [];
+  const strokes: string[] = [];
+
+  // Match fill: <color> (also handles fill: <color> !important)
+  const fillMatch = styleAttr.match(/(?:^|[;])\s*fill\s*:\s*([^;!]+)/i);
+  if (fillMatch) fills.push(fillMatch[1]!.trim());
+
+  // Match stroke: <color>
+  const strokeMatch = styleAttr.match(/(?:^|[;])\s*stroke\s*:\s*([^;!]+)/i);
+  if (strokeMatch) strokes.push(strokeMatch[1]!.trim());
+
+  // Match background-color or other color properties that affect appearance
+  const bgMatch = styleAttr.match(
+    /(?:^|[;])\s*(?:background-color|background)\s*:\s*([^;!]+)/i,
+  );
+  if (bgMatch) fills.push(bgMatch[1]!.trim());
+
+  return { fills, strokes };
+}
+
+/**
  * Counts unique fill and stroke colors used in the SVG.
+ * Checks both dedicated attributes (fill="...", stroke="...") and inline style attributes.
  */
 function countColors(svg: string): {
   fills: Set<string>;
@@ -45,6 +72,8 @@ function countColors(svg: string): {
 } {
   const fills = new Set<string>();
   const strokes = new Set<string>();
+
+  // Check dedicated attributes
   const fillRegex = /fill=["']([^"']+)["']/g;
   const strokeRegex = /stroke=["']([^"']+)["']/g;
   let match: RegExpExecArray | null;
@@ -54,8 +83,28 @@ function countColors(svg: string): {
   while ((match = strokeRegex.exec(svg)) !== null) {
     strokes.add(match[1]!);
   }
+
+  // Also check inline style attributes for fill/stroke declarations
+  const styleRegex = /style=["']([^"']+)["']/g;
+  while ((match = styleRegex.exec(svg)) !== null) {
+    const { fills: styleFills, strokes: styleStrokes } =
+      extractColorsFromStyle(match[1]!);
+    for (const c of styleFills) fills.add(c);
+    for (const c of styleStrokes) strokes.add(c);
+  }
+
   return { fills, strokes };
 }
+
+/**
+ * A set of well-known SVG color names for display in color analysis.
+ */
+const WELL_KNOWN_COLORS = new Set([
+  "currentColor",
+  "inherit",
+  "transparent",
+  "none",
+]);
 
 /**
  * Sidebar panel displaying SVG metadata: viewBox dimensions, element counts,
@@ -66,7 +115,10 @@ export function ToolSidebar({ svg }: ToolSidebarProps) {
   const viewBox = useMemo(() => parseViewBox(svg), [svg]);
   const elements = useMemo(() => (svg.trim() ? countElements(svg) : {}), [svg]);
   const { fills, strokes } = useMemo(
-    () => (svg.trim() ? countColors(svg) : { fills: new Set<string>(), strokes: new Set<string>() }),
+    () =>
+      svg.trim()
+        ? countColors(svg)
+        : { fills: new Set<string>(), strokes: new Set<string>() },
     [svg],
   );
 
@@ -145,8 +197,12 @@ export function ToolSidebar({ svg }: ToolSidebarProps) {
                       title={color}
                     >
                       <span
-                        className="color-swatch"
-                        style={{ backgroundColor: color }}
+                        className={`color-swatch ${WELL_KNOWN_COLORS.has(color) ? "color-swatch-semantic" : ""}`}
+                        style={{
+                          backgroundColor: WELL_KNOWN_COLORS.has(color)
+                            ? "transparent"
+                            : color,
+                        }}
                       />
                       <span className="color-swatch-label">{color}</span>
                     </span>
@@ -168,8 +224,12 @@ export function ToolSidebar({ svg }: ToolSidebarProps) {
                       title={color}
                     >
                       <span
-                        className="color-swatch"
-                        style={{ backgroundColor: color }}
+                        className={`color-swatch ${WELL_KNOWN_COLORS.has(color) ? "color-swatch-semantic" : ""}`}
+                        style={{
+                          backgroundColor: WELL_KNOWN_COLORS.has(color)
+                            ? "transparent"
+                            : color,
+                        }}
                       />
                       <span className="color-swatch-label">{color}</span>
                     </span>
