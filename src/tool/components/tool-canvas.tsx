@@ -73,6 +73,9 @@ export function ToolCanvas({
       if (tab === "preview") {
         const syntaxError = validateSvgSyntax(svg);
         setSvgError(syntaxError);
+        // Refresh preview HTML immediately so the user sees current SVG
+        const bg = getPreviewBackground(previewContainerRef.current);
+        setPreviewHtml(buildPreviewHtml(svg, bg));
       } else {
         setSvgError(null);
       }
@@ -90,8 +93,11 @@ export function ToolCanvas({
     buildPreviewHtml(svg, "#f8fafc"),
   );
 
-  // Rebuild preview HTML on svg change, using the current effective background
+  // Rebuild preview HTML only when preview is active and SVG changes,
+  // using the current effective background. Avoids unnecessary work
+  // when the user is editing code and hasn't switched to preview.
   useEffect(() => {
+    if (activeTab !== "preview") return;
     const bg = getPreviewBackground(previewContainerRef.current);
     setPreviewHtml(buildPreviewHtml(svg, bg));
   }, [svg, activeTab]);
