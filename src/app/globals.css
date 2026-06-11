@@ -776,6 +776,26 @@ body {
   outline-offset: 2px;
 }
 
+.svg-editor-mini-btn-danger {
+  color: var(--error);
+  border-color: var(--error);
+}
+
+.svg-editor-mini-btn-danger:hover {
+  background: var(--error);
+  color: #ffffff;
+  border-color: var(--error);
+}
+
+.svg-editor-mini-btn-danger:active {
+  transform: scale(0.97);
+}
+
+.svg-editor-mini-btn-danger:focus-visible {
+  outline: 2px solid var(--error);
+  outline-offset: 2px;
+}
+
 .svg-editor-textarea {
   flex: 1;
   min-height: 300px;

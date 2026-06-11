@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatSvg, validateSvgSyntax } from "../svg-formatter";
+import { DEFAULT_SVG } from "../constants";
 
 interface ToolCanvasProps {
   svg: string;
@@ -10,6 +11,8 @@ interface ToolCanvasProps {
   onChange?: (svg: string) => void;
   /** Callback invoked when an error occurs (e.g. copy failure) */
   onError?: (message: string) => void;
+  /** Callback to reset the SVG to the default value */
+  onReset?: () => void;
 }
 
 /**
@@ -49,6 +52,7 @@ export function ToolCanvas({
   canvasRef,
   onChange,
   onError,
+  onReset,
 }: ToolCanvasProps) {
   const [activeTab, setActiveTab] = useState<"editor" | "preview">("editor");
   const [svgError, setSvgError] = useState<string | null>(null);
@@ -199,6 +203,17 @@ export function ToolCanvas({
             >
               Download
             </button>
+            {!readOnly && onReset && (
+              <button
+                type="button"
+                className="svg-editor-mini-btn svg-editor-mini-btn-danger"
+                onClick={onReset}
+                title="Reset to default SVG"
+                aria-label="Reset to default SVG"
+              >
+                Reset
+              </button>
+            )}
           </div>
         </div>
         <textarea

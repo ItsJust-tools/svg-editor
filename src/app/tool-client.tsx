@@ -43,6 +43,11 @@ export default function ToolClient() {
     [setToolData],
   );
 
+  const handleReset = useCallback(() => {
+    setToolData((prev) => ({ ...prev, svg: toolDefinition.initialState.svg }));
+    showToast("Reset to default SVG", "success");
+  }, [setToolData, showToast]);
+
   const handleInsertShape = useCallback(
     (shape: string) => {
       const svg = tool.state.data.svg;
@@ -181,6 +186,7 @@ export default function ToolClient() {
       svg={tool.state.data.svg}
       onChange={handleSvgChange}
       onError={(msg) => showToast(msg, "error")}
+      onReset={handleReset}
     />
   );
 

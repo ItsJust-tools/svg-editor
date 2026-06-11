@@ -25,7 +25,7 @@ const SHAPE_SHORTCUTS: Record<string, string> = {
  * @param props.onInsertShape - Callback invoked with the shape name when a
  *   shape button is clicked. When omitted, shape insertion buttons are hidden.
  */
-export function ToolToolbar({ onInsertShape }: ToolToolbarProps = {}) {
+export function ToolToolbar({ onInsertShape }: ToolToolbarProps) {
   // Keyboard shortcuts for shape insertion
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
