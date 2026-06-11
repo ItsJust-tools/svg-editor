@@ -36,7 +36,7 @@ function createPrintClone(element: HTMLElement): string {
   const textarea = clone.querySelector("textarea");
   if (textarea instanceof HTMLTextAreaElement && textarea.parentNode) {
     const replacement = document.createElement("div");
-    replacement.className = "notepad-textarea-replacement";
+    replacement.className = "svg-editor-textarea-replacement";
     replacement.textContent = textarea.value;
 
     const computed = window.getComputedStyle(textarea);

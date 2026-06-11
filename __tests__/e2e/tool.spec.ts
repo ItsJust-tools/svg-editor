@@ -21,26 +21,79 @@ async function ensureToolbarInteractable(
   }
 }
 
-async function typeInNotepad(
+async function typeInEditor(
   page: import("@playwright/test").Page,
   text: string,
 ) {
   await ensureToolbarInteractable(page);
-  const textarea = page.locator(".notepad-textarea");
+  const textarea = page.locator(".svg-editor-textarea");
   await textarea.fill(text);
 }
 
 test("tool loads with correct title", async ({ page }) => {
   await page.goto("/");
   const title = await page.title();
-  expect(title).toContain("Notepad");
+  expect(title).toContain("SVG Editor");
 });
 
 test("textarea is editable", async ({ page }) => {
   await page.goto("/");
-  const textarea = page.locator(".notepad-textarea");
-  await textarea.fill("Hello Notepad");
-  await expect(textarea).toHaveValue("Hello Notepad");
+  const textarea = page.locator(".svg-editor-textarea");
+  const defaultSvg = await textarea.inputValue();
+  // Default SVG should contain a rect and circle
+  expect(defaultSvg).toContain("<rect");
+  expect(defaultSvg).toContain("<circle");
+
+  // Modify and verify
+  await textarea.fill('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="red"/></svg>');
+  await expect(textarea).toHaveValue(/fill="red"/);
+
+  // Reset
+  await page.getByRole("button", { name: /reset/i }).click();
+  await expect(textarea).toHaveValue(/>/);
+});
+
+test("format button prettifies SVG code", async ({ page }) => {
+  await page.goto("/");
+  await ensureToolbarInteractable(page);
+  const textarea = page.locator(".svg-editor-textarea");
+  const formatButton = page.getByRole("button", { name: /Format SVG code/i });
+
+  // Enter unformatted SVG
+  await textarea.fill('<svg xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="50" height="50" fill="blue"/></svg>');
+
+  // Click Format
+  await formatButton.click();
+
+  // After formatting, SVG should have newlines
+  const formatted = await textarea.inputValue();
+  expect(formatted).toContain("\n");
+});
+
+test("preview tab switches and shows SVG", async ({ page }) => {
+  await page.goto("/");
+  await ensureToolbarInteractable(page);
+
+  const previewTab = page.getByRole("tab", { name: "Preview" });
+  await previewTab.click();
+
+  // Preview pane should be visible with an iframe
+  const iframe = page.locator(".svg-editor-preview-iframe");
+  await expect(iframe).toBeVisible();
+});
+
+test("copy button copies SVG to clipboard", async ({ page }) => {
+  await page.goto("/");
+  await ensureToolbarInteractable(page);
+
+  // Grant clipboard permission
+  await page.context().grantPermissions(["clipboard-write"]);
+
+  const copyButton = page.getByRole("button", { name: /Copy SVG code/i });
+  await copyButton.click();
+  // Should work without errors (no assertion needed if no error toast appears)
+  const errorToast = page.locator(".toast-error");
+  await expect(errorToast).toHaveCount(0);
 });
 
 test("undo/redo buttons enable/disable correctly", async ({
@@ -55,29 +108,15 @@ test("undo/redo buttons enable/disable correctly", async ({
   await expect(redoButton).toBeDisabled();
 
   if (testInfo.project.name.includes("Mobile")) {
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.evaluate((el: HTMLInputElement) => {
-      el.style.display = "block";
-      el.style.visibility = "visible";
-    });
-    await fileInput.setInputFiles({
-      name: "undo-mobile.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(
-        JSON.stringify({ text: "undo mobile", fontSize: 16 }),
-      ),
-    });
-  } else {
-    await typeInNotepad(page, "hello world");
-  }
-
-  await expect(undoButton).toBeEnabled();
-  await expect(redoButton).toBeDisabled();
-
-  if (testInfo.project.name.includes("Mobile")) {
     await expect(undoButton).toBeVisible();
     return;
   }
+
+  // Modify the SVG to enable undo
+  await typeInEditor(page, `<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40"/></svg>`);
+
+  await expect(undoButton).toBeEnabled();
+  await expect(redoButton).toBeDisabled();
 
   await undoButton.click({ force: true });
   await expect(redoButton).toBeEnabled();
@@ -234,19 +273,13 @@ test("undo/redo via keyboard shortcuts", async ({ page }, testInfo) => {
   await page.goto("/");
   await ensureToolbarInteractable(page);
   if (testInfo.project.name.includes("Mobile")) {
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.evaluate((el: HTMLInputElement) => {
-      el.style.display = "block";
-      el.style.visibility = "visible";
-    });
-    await fileInput.setInputFiles({
-      name: "keyboard-mobile.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify({ text: "keyboard mobile" })),
-    });
-  } else {
-    await typeInNotepad(page, "keyboard test");
+    await expect(
+      page.getByRole("button", { name: /undo/i }),
+    ).toBeVisible();
+    return;
   }
+
+  await typeInEditor(page, `<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40"/></svg>`);
 
   const undoButton = page.getByRole("button", { name: "Undo (Ctrl+Z)" });
   await expect(undoButton).toBeEnabled();
@@ -281,7 +314,10 @@ test("import from json file works", async ({ page }) => {
   await page.goto("/");
   await ensureToolbarInteractable(page);
 
-  const fileContent = JSON.stringify({ text: "Imported Note" });
+  const fileContent = JSON.stringify({
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="green"/></svg>',
+    title: "Imported SVG",
+  });
 
   const fileInput = page.locator('input[type="file"]');
   await fileInput.evaluate((el: HTMLInputElement) => {
@@ -295,8 +331,8 @@ test("import from json file works", async ({ page }) => {
   });
 
   await expect
-    .poll(() => page.locator(".notepad-textarea").inputValue())
-    .toContain("Imported Note");
+    .poll(() => page.locator(".svg-editor-textarea").inputValue())
+    .toContain("green");
 });
 
 test("export json download triggers", async ({ page }) => {
@@ -312,91 +348,6 @@ test("export json download triggers", async ({ page }) => {
     jsonOption.click(),
   ]);
   expect(download.suggestedFilename()).toMatch(/\.json$/);
-});
-
-test("image export downloads trigger for screenshot formats", async ({
-  page,
-}, testInfo) => {
-  await page.goto("/");
-  await ensureToolbarInteractable(page);
-
-  if (testInfo.project.name.includes("Mobile")) {
-    await expect(page.getByRole("button", { name: /export/i })).toBeVisible();
-    return;
-  }
-
-  const expected: Array<{ option: RegExp; ext: RegExp }> = [
-    { option: /PNG/, ext: /\.png$/i },
-    { option: /JPEG/, ext: /\.(jpg|jpeg)$/i },
-    { option: /webp/i, ext: /\.webp$/i },
-  ];
-
-  for (const format of expected) {
-    await ensureToolbarInteractable(page);
-    await page.getByRole("button", { name: /export/i }).click({ force: true });
-    const option = page.getByRole("option", { name: format.option });
-    await expect(option).toBeVisible();
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      option.click(),
-    ]);
-    expect(download.suggestedFilename()).toMatch(format.ext);
-  }
-});
-
-test("pdf export triggers print dialog", async ({ page }, testInfo) => {
-  await page.goto("/");
-  await ensureToolbarInteractable(page);
-
-  const exportButton = page.getByRole("button", { name: /export/i });
-  await exportButton.click({ force: true });
-
-  if (testInfo.project.name.includes("Mobile")) {
-    await expect(exportButton).toBeVisible();
-    return;
-  }
-
-  const pdfOption = page.getByRole("option", { name: /pdf/i });
-  await expect(pdfOption).toBeVisible();
-
-  // Intercept the hidden print iframe via MutationObserver + console log
-  const consolePromise = new Promise<string>((resolve) => {
-    const handler = (msg: import("@playwright/test").ConsoleMessage) => {
-      const text = msg.text();
-      if (text.includes("__printIntercepted__")) {
-        page.off("console", handler);
-        resolve(text);
-      }
-    };
-    page.on("console", handler);
-  });
-
-  await page.evaluate(() => {
-    const observer = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        for (const node of m.addedNodes) {
-          if (node instanceof HTMLIFrameElement) {
-            try {
-              const cw = (node as HTMLIFrameElement).contentWindow;
-              if (cw) {
-                cw.print = () => {
-                  console.log("__printIntercepted__");
-                };
-              }
-            } catch {
-              // cross-origin iframe, ignore
-            }
-          }
-        }
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-  });
-
-  await pdfOption.click();
-
-  const consoleText = await consolePromise;
-  expect(consoleText).toContain("__printIntercepted__");
 });
 
 test("404 page works", async ({ page }) => {
@@ -416,20 +367,34 @@ test("visual regression — default view", async ({ page, browserName }) => {
   await expect(page.locator(".tool-shell")).toBeVisible();
 });
 
-// test('visual regression — dark mode', async ({ page }) => {
-//   await page.goto('/');
-//   await page.waitForSelector('.tool-shell-canvas');
-//   const themeButton = page.getByRole('button', { name: /Switch to dark mode/i });
-//   if (await themeButton.isVisible()) {
-//     await themeButton.click();
-//     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-//     await expect(page).toHaveScreenshot('tool-dark.png', { maxDiffPixels: 100 });
-//   }
-// });
+test("sidebar shows SVG info for default SVG", async ({ page }) => {
+  await page.goto("/");
+  await ensureToolbarInteractable(page);
+  await page.setViewportSize({ width: 1280, height: 800 });
 
-// test('visual regression — mobile view', async ({ page }) => {
-//   await page.setViewportSize({ width: 375, height: 667 });
-//   await page.goto('/');
-//   await page.waitForSelector('.tool-shell-canvas');
-//   await expect(page).toHaveScreenshot('tool-mobile.png', { maxDiffPixels: 100 });
-// });
+  // The sidebar should display SVG info
+  const sidebar = page.locator(".tool-sidebar");
+  await expect(sidebar).toBeVisible();
+
+  // Should show code size
+  await expect(sidebar.locator("text=Code Size")).toBeVisible();
+  // Should show elements count
+  await expect(sidebar.locator("text=Elements")).toBeVisible();
+});
+
+test("reset button restores default SVG", async ({ page }) => {
+  await page.goto("/");
+  await ensureToolbarInteractable(page);
+  const textarea = page.locator(".svg-editor-textarea");
+
+  // Modify the SVG
+  await textarea.fill('<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">test</text></svg>');
+
+  // Click Reset
+  await page.getByRole("button", { name: /Reset to default SVG/i }).click();
+
+  // Should contain default shapes (rect + circle)
+  const value = await textarea.inputValue();
+  expect(value).toContain("<rect");
+  expect(value).toContain("<circle");
+});

@@ -59,7 +59,7 @@ Open [http://localhost:3000](http://localhost:3000) to start editing SVGs.
 | `Ctrl` + `Y`           | Redo                           |
 | `Ctrl` + `Shift` + `E` | Export current SVG             |
 
-> **Note:** Shape insertion shortcuts (`Alt+…`) only work when the focus is outside of text inputs or textareas (e.g., when the code editor is not focused). Format shortcut (`Alt+Shift+F`) works anywhere to keep your workflow smooth.
+> **Note:** Shape insertion shortcuts (`Alt+…`) only work when the focus is outside of text inputs or textareas (e.g., when the code editor is not focused). Format shortcut (`Alt+Shift+F`) works anywhere in the editor.
 
 ## Project Structure
 
