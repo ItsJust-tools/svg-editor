@@ -46,18 +46,18 @@ Open [http://localhost:3000](http://localhost:3000) to start editing SVGs.
 
 ## Keyboard Shortcuts
 
-| Shortcut                | Action                         |
-| ----------------------- | ------------------------------ |
-| `Alt` + `R`            | Insert rectangle               |
-| `Alt` + `C`            | Insert circle                  |
-| `Alt` + `E`            | Insert ellipse                 |
-| `Alt` + `P`            | Insert path                    |
-| `Alt` + `T`            | Insert text                    |
-| `Alt` + `L`            | Insert line                    |
-| `Alt` + `Shift` + `F`  | Format/indent SVG code         |
-| `Ctrl` + `Z`           | Undo                           |
-| `Ctrl` + `Y`           | Redo                           |
-| `Ctrl` + `Shift` + `E` | Export current SVG             |
+| Shortcut               | Action                 |
+| ---------------------- | ---------------------- |
+| `Alt` + `R`            | Insert rectangle       |
+| `Alt` + `C`            | Insert circle          |
+| `Alt` + `E`            | Insert ellipse         |
+| `Alt` + `P`            | Insert path            |
+| `Alt` + `T`            | Insert text            |
+| `Alt` + `L`            | Insert line            |
+| `Alt` + `Shift` + `F`  | Format/indent SVG code |
+| `Ctrl` + `Z`           | Undo                   |
+| `Ctrl` + `Y`           | Redo                   |
+| `Ctrl` + `Shift` + `E` | Export current SVG     |
 
 > **Note:** Shape insertion shortcuts (`Alt+…`) only work when the focus is outside of text inputs or textareas (e.g., when the code editor is not focused). Format shortcut (`Alt+Shift+F`) works anywhere in the editor.
 
@@ -91,13 +91,13 @@ __tests__/
 
 ## Scripts
 
-| Command            | Description                       |
-| ------------------ | --------------------------------- |
-| `npm run dev`      | Start dev server (Turbopack)      |
-| `npm run build`    | Build core package + Next.js      |
-| `npm run test`     | Run Vitest unit tests             |
-| `npm run lint`     | Run ESLint                        |
-| `npm run format`   | Format with Prettier              |
+| Command                | Description                    |
+| ---------------------- | ------------------------------ |
+| `npm run dev`          | Start dev server (Turbopack)   |
+| `npm run build`        | Build core package + Next.js   |
+| `npm run test`         | Run Vitest unit tests          |
+| `npm run lint`         | Run ESLint                     |
+| `npm run format`       | Format with Prettier           |
 | `npm run format:check` | Check formatting with Prettier |
 
 ## Troubleshooting

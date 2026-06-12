@@ -39,9 +39,10 @@ function countElements(svg: string): Record<string, number> {
 /**
  * Extracts color values from an SVG `style` attribute string (e.g. "fill:red;stroke:blue").
  */
-function extractColorsFromStyle(
-  styleAttr: string,
-): { fills: string[]; strokes: string[] } {
+function extractColorsFromStyle(styleAttr: string): {
+  fills: string[];
+  strokes: string[];
+} {
   const fills: string[] = [];
   const strokes: string[] = [];
 
@@ -87,8 +88,9 @@ function countColors(svg: string): {
   // Also check inline style attributes for fill/stroke declarations
   const styleRegex = /style=["']([^"']+)["']/g;
   while ((match = styleRegex.exec(svg)) !== null) {
-    const { fills: styleFills, strokes: styleStrokes } =
-      extractColorsFromStyle(match[1]!);
+    const { fills: styleFills, strokes: styleStrokes } = extractColorsFromStyle(
+      match[1]!,
+    );
     for (const c of styleFills) fills.add(c);
     for (const c of styleStrokes) strokes.add(c);
   }
@@ -235,7 +237,9 @@ export function ToolSidebar({ svg }: ToolSidebarProps) {
                     </span>
                   ))}
                   {strokes.size > 12 && (
-                    <span className="color-more">+{strokes.size - 12} more</span>
+                    <span className="color-more">
+                      +{strokes.size - 12} more
+                    </span>
                   )}
                 </div>
               </div>

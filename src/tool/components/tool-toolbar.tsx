@@ -31,8 +31,7 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps) {
     (e: KeyboardEvent) => {
       if (!onInsertShape) return;
       // Ignore if user is typing in an input/textarea
-      const tag =
-        (e.target as HTMLElement)?.tagName?.toLowerCase() || "";
+      const tag = (e.target as HTMLElement)?.tagName?.toLowerCase() || "";
       if (tag === "input" || tag === "textarea" || tag === "select") return;
 
       // Alt+key shortcuts for shapes

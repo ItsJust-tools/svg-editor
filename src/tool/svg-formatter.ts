@@ -101,7 +101,8 @@ export function validateSvgSyntax(svg: string): string | null {
   const openTags: string[] = [];
   // Match XML tags: supports namespaced tags (e.g. dc:title) as well as
   // standard tag names with optional attributes.
-  const tagRegex = /<\/?([a-zA-Z][a-zA-Z0-9]*(?::[a-zA-Z][a-zA-Z0-9]*)?)(?:\s[^>]*)?\/?>/g;
+  const tagRegex =
+    /<\/?([a-zA-Z][a-zA-Z0-9]*(?::[a-zA-Z][a-zA-Z0-9]*)?)(?:\s[^>]*)?\/?>/g;
   let match: RegExpExecArray | null;
 
   while ((match = tagRegex.exec(svg)) !== null) {
