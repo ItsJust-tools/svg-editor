@@ -45,7 +45,9 @@ test("textarea is editable", async ({ page }) => {
   expect(defaultSvg).toContain("<circle");
 
   // Modify and verify
-  await textarea.fill('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="red"/></svg>');
+  await textarea.fill(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="red"/></svg>',
+  );
   await expect(textarea).toHaveValue(/fill="red"/);
 
   // Reset
@@ -60,7 +62,9 @@ test("format button prettifies SVG code", async ({ page }) => {
   const formatButton = page.getByRole("button", { name: /Format SVG code/i });
 
   // Enter unformatted SVG
-  await textarea.fill('<svg xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="50" height="50" fill="blue"/></svg>');
+  await textarea.fill(
+    '<svg xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="50" height="50" fill="blue"/></svg>',
+  );
 
   // Click Format
   await formatButton.click();
@@ -113,7 +117,10 @@ test("undo/redo buttons enable/disable correctly", async ({
   }
 
   // Modify the SVG to enable undo
-  await typeInEditor(page, `<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40"/></svg>`);
+  await typeInEditor(
+    page,
+    `<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40"/></svg>`,
+  );
 
   await expect(undoButton).toBeEnabled();
   await expect(redoButton).toBeDisabled();
@@ -273,13 +280,14 @@ test("undo/redo via keyboard shortcuts", async ({ page }, testInfo) => {
   await page.goto("/");
   await ensureToolbarInteractable(page);
   if (testInfo.project.name.includes("Mobile")) {
-    await expect(
-      page.getByRole("button", { name: /undo/i }),
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /undo/i })).toBeVisible();
     return;
   }
 
-  await typeInEditor(page, `<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40"/></svg>`);
+  await typeInEditor(
+    page,
+    `<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40"/></svg>`,
+  );
 
   const undoButton = page.getByRole("button", { name: "Undo (Ctrl+Z)" });
   await expect(undoButton).toBeEnabled();
@@ -388,7 +396,9 @@ test("reset button restores default SVG", async ({ page }) => {
   const textarea = page.locator(".svg-editor-textarea");
 
   // Modify the SVG
-  await textarea.fill('<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">test</text></svg>');
+  await textarea.fill(
+    '<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">test</text></svg>',
+  );
 
   // Click Reset
   await page.getByRole("button", { name: /Reset to default SVG/i }).click();

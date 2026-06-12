@@ -11,8 +11,7 @@ describe("formatSvg", () => {
   });
 
   it("formats deeply nested SVG elements", () => {
-    const input =
-      "<svg><g><rect /><circle /></g></svg>";
+    const input = "<svg><g><rect /><circle /></g></svg>";
     const result = formatSvg(input);
     expect(result).toBe(
       "<svg>\n  <g>\n    <rect />\n    <circle />\n  </g>\n</svg>",
@@ -38,7 +37,7 @@ describe("formatSvg", () => {
     const input = "<svg><!-- this is a comment --><rect/></svg>";
     const result = formatSvg(input);
     expect(result).toBe(
-      "<svg>\n<!-- this is a comment -->\n  <rect/>\n</svg>",
+      "<svg>\n  <!-- this is a comment -->\n  <rect/>\n</svg>",
     );
   });
 
@@ -84,11 +83,10 @@ describe("formatSvg", () => {
   });
 
   it("handles elements with text content and nested children", () => {
-    const input =
-      "<svg><g><text>hi</text><circle r=\"5\"/></g></svg>";
+    const input = '<svg><g><text>hi</text><circle r="5"/></g></svg>';
     const result = formatSvg(input);
     expect(result).toBe(
-      "<svg>\n  <g>\n    <text>\nhi\n    </text>\n    <circle r=\"5\"/>\n  </g>\n</svg>",
+      '<svg>\n  <g>\n    <text>\nhi\n    </text>\n    <circle r="5"/>\n  </g>\n</svg>',
     );
   });
 });
@@ -96,7 +94,9 @@ describe("formatSvg", () => {
 describe("validateSvgSyntax", () => {
   it("returns null for well-formed SVG", () => {
     expect(
-      validateSvgSyntax('<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>'),
+      validateSvgSyntax(
+        '<svg xmlns="http://www.w3.org/2000/svg"><rect/></svg>',
+      ),
     ).toBeNull();
   });
 

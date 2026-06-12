@@ -59,6 +59,10 @@ export function ToolCanvas({
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  const [previewHtml, setPreviewHtml] = useState(() =>
+    buildPreviewHtml(svg, "#f8fafc"),
+  );
+
   /** Clear error when SVG changes */
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -85,16 +89,7 @@ export function ToolCanvas({
       }
       setActiveTab(tab);
     },
-    [svg],
-  );
-
-  /**
-   * Generates an HTML document wrapping the SVG for the iframe preview.
-   * Reads the container's current effective background so dark mode and
-   * high-contrast themes are accurately reflected.
-   */
-  const [previewHtml, setPreviewHtml] = useState(() =>
-    buildPreviewHtml(svg, "#f8fafc"),
+    [svg, setPreviewHtml],
   );
 
   // Rebuild preview HTML only when preview is active and SVG changes,
