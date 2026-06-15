@@ -59,7 +59,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.2",
-    "@vitest/coverage-v8": "^4.1.7",
+    "@vitest/coverage-v8": "^4.1.9",
     "depcheck": "^1.4.7",
     "eslint": "^9",
     "eslint-config-next": "^16.2.7",
