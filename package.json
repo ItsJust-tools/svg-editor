@@ -1,6 +1,6 @@
 {
   "name": "svg-editor",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Full visual SVG editor with shape tools, text support, and bi-directional code sync. Edit on canvas or in code, export clean SVG.",
   "private": true,
   "license": "MIT",

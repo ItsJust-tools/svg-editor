@@ -45,6 +45,16 @@ const toolConfig = {
           label: "Format",
           description: "format/indent SVG code",
         },
+        {
+          keys: "Tab",
+          label: "Indent",
+          description: "insert 2-space indent in code editor",
+        },
+        {
+          keys: "Shift+Tab",
+          label: "Outdent",
+          description: "remove indent in code editor",
+        },
       ],
     },
     {

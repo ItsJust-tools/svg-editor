@@ -9,19 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Keyboard shortcuts table in README**: Documented all available shortcuts (shape insertion Alt+ shortcuts, Ctrl+Z/Y undo/redo, Ctrl+Shift+E export) in a reference table.
-- **SVG Editor component CSS**: Added proper styling for all `svg-editor-*` component classNames (canvas, tabs, code editor textarea, preview pane, mini-toolbar, buttons) with responsive mobile adjustments.
-- **Stroke colors in sidebar**: ToolSidebar now displays stroke colors alongside fill colors, with grouped display and a limit of 12 colors per group before showing "+N more".
-- **Keyboard shortcuts for shape insertion**: Alt+R (rect), Alt+C (circle), Alt+E (ellipse), Alt+P (path), Alt+T (text), Alt+L (line) — shown in button tooltips.
+- **Tab/Shift+Tab in code editor**: Pressing Tab inserts 2 spaces instead of losing focus. Shift+Tab removes 2 spaces at the start of the current line. Keyboard shortcuts documented in README and keyboard overlay.
 
 ### Fixed
 
-- **Sidebar color HTML structure**: Replaced broken `<dl>`/`<dt>`/`<dd>` nesting with proper semantic `<div>`-based layout in the colors section.
-- **Copy error handling**: ToolCanvas now reports clipboard failures via the new `onError` prop instead of silently swallowing them.
+- **Regex for self-closing tags in sidebar**: Updated `countElements` tag regex in ToolSidebar to match `<tagName/>`, `<tagName />`, and `<tagName` at end of string, not just `<tagName ...>` — improves element count accuracy for compact SVG.
 
 ### Changed
 
-- Bumped to 1.5.0.
+- Bumped to 1.6.0.
+
+## [1.5.0] - 2026-06-15
 
 ## [1.4.0] - 2026-05-23
 

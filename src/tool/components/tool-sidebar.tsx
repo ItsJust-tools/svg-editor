@@ -24,8 +24,8 @@ function parseViewBox(svg: string): { width: number; height: number } | null {
  */
 function countElements(svg: string): Record<string, number> {
   const counts: Record<string, number> = {};
-  // Match opening tags: <tagName ...>
-  const tagRegex = /<\s*([a-zA-Z][a-zA-Z0-9]*)[\s>]/g;
+  // Match opening tags: <tagName ...>, <tagName/>, <tagName />, or <tagName at EOF
+  const tagRegex = /<\s*([a-zA-Z][a-zA-Z0-9]*)(?:[\s>/]|$)/g;
   let match: RegExpExecArray | null;
   while ((match = tagRegex.exec(svg)) !== null) {
     const tag = match[1]!.toLowerCase();

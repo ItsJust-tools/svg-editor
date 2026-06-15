@@ -73,6 +73,57 @@ export function ToolCanvas({
   );
 
   /**
+   * Handle Tab key in the code editor to insert spaces instead of
+   * losing focus. Uses a ref to check the active textarea element
+   * and modify its selection range directly.
+   */
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key !== "Tab") return;
+      e.preventDefault();
+
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      const { selectionStart, selectionEnd } = textarea;
+      const value = textarea.value;
+
+      if (!e.shiftKey) {
+        // Insert 2-space indent at cursor
+        const before = value.slice(0, selectionStart);
+        const after = value.slice(selectionEnd);
+        const newValue = before + "  " + after;
+        onChange?.(newValue);
+        // Restore cursor position after React re-render
+        requestAnimationFrame(() => {
+          textarea.selectionStart = textarea.selectionEnd = selectionStart + 2;
+        });
+      } else {
+        // Shift+Tab: remove up to 2 spaces at the start of the current line
+        const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
+        const spacesBefore = value.slice(lineStart, selectionStart);
+        const indent = spacesBefore.match(/^ {1,2}/);
+        const removeCount = indent ? indent[0].length : 0;
+        if (removeCount > 0) {
+          const before =
+            value.slice(0, lineStart) +
+            value.slice(lineStart + removeCount, selectionStart);
+          const after = value.slice(selectionEnd);
+          const newValue = before + after;
+          onChange?.(newValue);
+          requestAnimationFrame(() => {
+            const newPos = Math.max(lineStart, selectionStart - removeCount);
+            textarea.selectionStart = textarea.selectionEnd = newPos;
+          });
+        }
+      }
+    },
+    [onChange],
+  );
+
+  /**
    * Switch to the preview tab, validating the SVG syntax first.
    * Errors are shown inline in the preview pane header.
    */
@@ -212,9 +263,11 @@ export function ToolCanvas({
           </div>
         </div>
         <textarea
+          ref={textareaRef}
           className="svg-editor-textarea"
           value={svg}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
           readOnly={readOnly}
           placeholder='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">...</svg>'
           aria-label="SVG code editor"

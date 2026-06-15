@@ -46,18 +46,20 @@ Open [http://localhost:3000](http://localhost:3000) to start editing SVGs.
 
 ## Keyboard Shortcuts
 
-| Shortcut               | Action                 |
-| ---------------------- | ---------------------- |
-| `Alt` + `R`            | Insert rectangle       |
-| `Alt` + `C`            | Insert circle          |
-| `Alt` + `E`            | Insert ellipse         |
-| `Alt` + `P`            | Insert path            |
-| `Alt` + `T`            | Insert text            |
-| `Alt` + `L`            | Insert line            |
-| `Alt` + `Shift` + `F`  | Format/indent SVG code |
-| `Ctrl` + `Z`           | Undo                   |
-| `Ctrl` + `Y`           | Redo                   |
-| `Ctrl` + `Shift` + `E` | Export current SVG     |
+| Shortcut               | Action                               |
+| ---------------------- | ------------------------------------ |
+| `Alt` + `R`            | Insert rectangle                     |
+| `Alt` + `C`            | Insert circle                        |
+| `Alt` + `E`            | Insert ellipse                       |
+| `Alt` + `P`            | Insert path                          |
+| `Alt` + `T`            | Insert text                          |
+| `Alt` + `L`            | Insert line                          |
+| `Alt` + `Shift` + `F`  | Format/indent SVG code               |
+| `Tab`                  | Insert 2-space indent in code editor |
+| `Shift` + `Tab`        | Remove indent in code editor         |
+| `Ctrl` + `Z`           | Undo                                 |
+| `Ctrl` + `Y`           | Redo                                 |
+| `Ctrl` + `Shift` + `E` | Export current SVG                   |
 
 > **Note:** Shape insertion shortcuts (`Alt+…`) only work when the focus is outside of text inputs or textareas (e.g., when the code editor is not focused). Format shortcut (`Alt+Shift+F`) works anywhere in the editor.
 
