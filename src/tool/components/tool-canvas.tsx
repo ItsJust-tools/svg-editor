@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatSvg, validateSvgSyntax } from "../svg-formatter";
 import { DEFAULT_SVG } from "../constants";
+import { copyToClipboard } from "@/lib/clipboard";
 
 interface ToolCanvasProps {
   svg: string;
@@ -153,9 +154,8 @@ export function ToolCanvas({
   }, [svg, activeTab]);
 
   const handleCopySvg = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(svg);
-    } catch {
+    const ok = await copyToClipboard(svg);
+    if (!ok) {
       onError?.("Failed to copy SVG code to clipboard");
     }
   }, [svg, onError]);

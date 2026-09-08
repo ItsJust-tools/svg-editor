@@ -14,6 +14,7 @@ import {
   ToolToolbar,
   ToolSidebar,
 } from "@/tool";
+import { copyToClipboard } from "@/lib/clipboard";
 
 export default function ToolClient() {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -130,7 +131,10 @@ export default function ToolClient() {
           if (error instanceof Error && error.name === "AbortError") return;
         }
       }
-      await navigator.clipboard.writeText(shareUrl);
+      const copied = await copyToClipboard(shareUrl);
+      if (!copied) {
+        throw new Error("Failed to copy share URL to clipboard");
+      }
       showToast("Share URL copied to clipboard", "success");
     } catch (error) {
       const message =
