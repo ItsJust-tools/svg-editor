@@ -4,6 +4,7 @@ import {
   throwIfAborted,
   renderToImage,
   createCanvasExporter,
+  sanitizeFilename,
 } from "@/tool/exporters/utils";
 import pdfExporter from "@/tool/exporters/pdf";
 import type { ExportOptions } from "@itsjust/core";
@@ -48,6 +49,50 @@ function createFakeCanvasContext() {
     rotate: vi.fn(),
   } as unknown as CanvasRenderingContext2D;
 }
+
+describe("sanitizeFilename", () => {
+  it("replaces invalid OS characters with dashes", () => {
+    expect(sanitizeFilename('a/b\\c:d*e?f"g<h>i|j%k', "default")).toBe(
+      "a-b-c-d-e-f-g-h-i-j-k",
+    );
+  });
+
+  it("strips control characters", () => {
+    expect(sanitizeFilename("file\x00name\x1f.txt", "default")).toBe(
+      "filename.txt",
+    );
+  });
+
+  it("trims surrounding whitespace", () => {
+    expect(sanitizeFilename("  my file  ", "default")).toBe("my file");
+  });
+
+  it("removes leading dots", () => {
+    expect(sanitizeFilename("...hidden", "default")).toBe("hidden");
+  });
+
+  it("enforces a max length of 100 characters", () => {
+    const long = "a".repeat(150);
+    expect(sanitizeFilename(long, "default").length).toBe(100);
+  });
+
+  it("falls back to defaultName when result is empty", () => {
+    expect(sanitizeFilename("...", "default")).toBe("default");
+    expect(sanitizeFilename("", "default")).toBe("default");
+  });
+
+  it("falls back to defaultName for non-string input", () => {
+    expect(sanitizeFilename(undefined as unknown as string, "default")).toBe(
+      "default",
+    );
+  });
+
+  it("keeps valid filenames unchanged", () => {
+    expect(sanitizeFilename("my-design-v2.png", "default")).toBe(
+      "my-design-v2.png",
+    );
+  });
+});
 
 describe("exporters", () => {
   const makeOptions = (

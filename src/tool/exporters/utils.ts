@@ -7,6 +7,33 @@ import type {
 import { toBlob } from "html-to-image";
 
 /**
+ * Sanitizes a filename against invalid OS characters and limits its length.
+ *
+ * Replaces characters that are invalid on Windows/Linux filesystems
+ * (`\`, `/`, `:`, `*`, `?`, `"`, `<`, `>`, `|`, `%`) with `-`, strips
+ * control characters and leading dots, trims whitespace, and enforces a
+ * maximum length of 100 characters. Falls back to `defaultName` when the
+ * result would be empty.
+ */
+export function sanitizeFilename(
+  filename: string,
+  defaultName: string,
+): string {
+  if (!filename || typeof filename !== "string") {
+    return defaultName;
+  }
+  const sanitized = filename
+    .replace(/[/\\?%*:|"<>]/g, "-")
+    .replace(/[\x00-\x1f\x80-\x9f]/g, "")
+    .trim()
+    .replace(/^\.+/, "");
+  if (!sanitized) {
+    return defaultName;
+  }
+  return sanitized.slice(0, 100);
+}
+
+/**
  * Formats an export error into a user-friendly message.
  * Provides a specific CORS hint when the error matches known cross-origin patterns.
  */
@@ -200,17 +227,25 @@ export function createCanvasExporter(
             quality,
           );
         });
+        const defaultName = `export-${Date.now()}.${defaultExt}`;
         return {
           success: true,
           data: blob,
-          filename: options.filename ?? `export-${Date.now()}.${defaultExt}`,
+          filename: sanitizeFilename(
+            options.filename ?? defaultName,
+            defaultName,
+          ),
           format,
         };
       } catch (error) {
+        const defaultName = `export-${Date.now()}.${defaultExt}`;
         return {
           success: false,
           data: null,
-          filename: options.filename ?? `export-${Date.now()}.${defaultExt}`,
+          filename: sanitizeFilename(
+            options.filename ?? defaultName,
+            defaultName,
+          ),
           format,
           error: formatExportError(error, format.toUpperCase()),
         };

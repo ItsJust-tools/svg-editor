@@ -1,4 +1,5 @@
 import type { Exporter } from "@itsjust/core";
+import { sanitizeFilename } from "./utils";
 
 /**
  * SVG exporter — serializes the SVG element on the canvas to a clean SVG file.
@@ -7,13 +8,17 @@ import type { Exporter } from "@itsjust/core";
 const svgExporter: Exporter = {
   format: "svg",
   export: async (element, options) => {
+    const defaultName = `export-${Date.now()}.svg`;
     try {
       const svgElement = element.querySelector("svg");
       if (!svgElement) {
         return {
           success: false,
           data: null,
-          filename: options.filename ?? `export-${Date.now()}.svg`,
+          filename: sanitizeFilename(
+            options.filename ?? defaultName,
+            defaultName,
+          ),
           format: "svg",
           error: "No SVG element found in the canvas",
         };
@@ -40,7 +45,10 @@ const svgExporter: Exporter = {
       return {
         success: true,
         data: blob,
-        filename: options.filename ?? `export-${Date.now()}.svg`,
+        filename: sanitizeFilename(
+          options.filename ?? defaultName,
+          defaultName,
+        ),
         format: "svg",
       };
     } catch (error) {
@@ -48,7 +56,10 @@ const svgExporter: Exporter = {
       return {
         success: false,
         data: null,
-        filename: options.filename ?? `export-${Date.now()}.svg`,
+        filename: sanitizeFilename(
+          options.filename ?? defaultName,
+          defaultName,
+        ),
         format: "svg",
         error: base,
       };
