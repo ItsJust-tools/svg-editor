@@ -1,5 +1,5 @@
 import type { Exporter } from "@itsjust/core";
-import { formatExportError, throwIfAborted } from "./utils";
+import { formatExportError, sanitizeFilename, throwIfAborted } from "./utils";
 
 /**
  * Collects all stylesheet CSS rules into a single string.
@@ -123,17 +123,25 @@ const pdfExporter: Exporter = {
       // Cleanup after print dialog is dismissed
       setTimeout(() => iframe.remove(), 1000);
 
+      const defaultName = `export-${Date.now()}.pdf`;
       return {
         success: true,
         data: null,
-        filename: options.filename ?? `export-${Date.now()}.pdf`,
+        filename: sanitizeFilename(
+          options.filename ?? defaultName,
+          defaultName,
+        ),
         format: "pdf",
       };
     } catch (error) {
+      const defaultName = `export-${Date.now()}.pdf`;
       return {
         success: false,
         data: null,
-        filename: options.filename ?? `export-${Date.now()}.pdf`,
+        filename: sanitizeFilename(
+          options.filename ?? defaultName,
+          defaultName,
+        ),
         format: "pdf",
         error: formatExportError(error, "PDF"),
       };
