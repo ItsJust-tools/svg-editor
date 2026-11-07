@@ -63,7 +63,7 @@ describe("SVG Editor deserialize", () => {
     const result = toolDefinition.deserialize("string");
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toContain("Invalid data");
+      expect(result.error).toContain("deserialize");
     }
   });
 
@@ -100,6 +100,59 @@ describe("SVG Editor deserialize", () => {
     if (result.success) {
       expect(result.data.svg).toBe("<svg></svg>");
       expect(result.data.title).toBe("My SVG");
+    }
+  });
+
+  it("accepts a valid JSON string and parses it", () => {
+    const result = toolDefinition.deserialize(
+      JSON.stringify({ svg: "<svg><rect /></svg>", title: "Shared" }),
+    );
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.svg).toBe("<svg><rect /></svg>");
+      expect(result.data.title).toBe("Shared");
+    }
+  });
+
+  it("rejects corrupted JSON string without throwing", () => {
+    const result = toolDefinition.deserialize("{ svg: <broken !!!");
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toContain("Failed to deserialize");
+    }
+  });
+
+  it("rejects undefined without throwing", () => {
+    const result = toolDefinition.deserialize(undefined);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toContain("Invalid data format");
+    }
+  });
+
+  it("rejects a JSON string that parses to invalid state", () => {
+    const result = toolDefinition.deserialize(JSON.stringify({ svg: 42 }));
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toContain("Invalid data format");
+    }
+  });
+
+  it("never throws for any exotic input", () => {
+    const inputs = [
+      NaN,
+      Symbol("x"),
+      () => {},
+      new Date(),
+      "{corrupted",
+      [],
+      0,
+      false,
+    ];
+    for (const input of inputs) {
+      expect(() => toolDefinition.deserialize(input)).not.toThrow();
+      const result = toolDefinition.deserialize(input);
+      expect(result.success).toBe(false);
     }
   });
 });
