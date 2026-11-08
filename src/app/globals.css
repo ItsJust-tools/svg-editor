@@ -882,6 +882,20 @@ body {
   font-weight: 500;
 }
 
+.svg-editor-zoom-controls {
+  align-items: center;
+}
+
+.svg-editor-zoom-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  min-width: 3.25rem;
+  text-align: right;
+  user-select: none;
+}
+
 @media (max-width: 640px) {
   .svg-editor-textarea {
     font-size: 0.75rem;
