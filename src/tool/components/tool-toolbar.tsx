@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 
 interface ToolToolbarProps {
   onInsertShape?: (shape: string) => void;
+  onOptimize?: () => void;
 }
 
 /**
@@ -24,8 +25,10 @@ const SHAPE_SHORTCUTS: Record<string, string> = {
  *
  * @param props.onInsertShape - Callback invoked with the shape name when a
  *   shape button is clicked. When omitted, shape insertion buttons are hidden.
+ * @param props.onOptimize - Callback invoked when the Optimize button is
+ *   clicked. When omitted, the optimize button is hidden.
  */
-export function ToolToolbar({ onInsertShape }: ToolToolbarProps) {
+export function ToolToolbar({ onInsertShape, onOptimize }: ToolToolbarProps) {
   // Keyboard shortcuts for shape insertion
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -34,9 +37,14 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps) {
       const tag = (e.target as HTMLElement)?.tagName?.toLowerCase() || "";
       if (tag === "input" || tag === "textarea" || tag === "select") return;
 
-      // Alt+key shortcuts for shapes
+      // Alt+key shortcuts
       if (!e.altKey) return;
       const key = e.key.toLowerCase();
+      if (key === "o" && onOptimize) {
+        e.preventDefault();
+        onOptimize();
+        return;
+      }
       for (const [shape, shortcut] of Object.entries(SHAPE_SHORTCUTS)) {
         if (key === shortcut.toLowerCase()) {
           e.preventDefault();
@@ -45,7 +53,7 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps) {
         }
       }
     },
-    [onInsertShape],
+    [onInsertShape, onOptimize],
   );
 
   useEffect(() => {
@@ -115,6 +123,20 @@ export function ToolToolbar({ onInsertShape }: ToolToolbarProps) {
             Line
           </button>
         </>
+      )}
+
+      <div className="toolbar-separator" />
+
+      {onOptimize && (
+        <button
+          type="button"
+          className="toolbar-btn"
+          onClick={onOptimize}
+          title="Optimize / Clean SVG: strip metadata, comments, empty groups and unused ids (Alt+O)"
+          aria-label="Optimize and clean SVG"
+        >
+          Optimize
+        </button>
       )}
 
       <div className="toolbar-separator" />

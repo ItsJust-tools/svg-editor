@@ -15,6 +15,7 @@ import {
   ToolSidebar,
 } from "@/tool";
 import { copyToClipboard } from "@/lib/clipboard";
+import { optimizeSvg } from "@/tool/svg-optimizer";
 
 export default function ToolClient() {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -48,6 +49,20 @@ export default function ToolClient() {
     setToolData((prev) => ({ ...prev, svg: toolDefinition.initialState.svg }));
     showToast("Reset to default SVG", "success");
   }, [setToolData, showToast]);
+
+  const handleOptimize = useCallback(() => {
+    const svg = tool.state.data.svg;
+    const result = optimizeSvg(svg);
+    if (result.removedCount === 0) {
+      showToast("Nothing to optimize — SVG is already clean");
+      return;
+    }
+    setToolData((prev) => ({ ...prev, svg: result.svg }));
+    showToast(
+      `Optimized SVG: removed ${result.removedCount} item${result.removedCount === 1 ? "" : "s"}`,
+      "success",
+    );
+  }, [tool.state.data.svg, setToolData, showToast]);
 
   const handleInsertShape = useCallback(
     (shape: string) => {
@@ -170,7 +185,10 @@ export default function ToolClient() {
 
   const toolbarContent = (
     <>
-      <ToolToolbar onInsertShape={handleInsertShape} />
+      <ToolToolbar
+        onInsertShape={handleInsertShape}
+        onOptimize={handleOptimize}
+      />
       <ImportExport
         formats={tool.supportedFormats}
         onExport={tool.handleExport}
