@@ -122,7 +122,8 @@ describe("app and seo", () => {
     });
     expect(toolDefinition.deserialize({ nope: true })).toEqual({
       success: false,
-      error: "Invalid data format: expected { svg: string, title?: string }",
+      error:
+        "Failed to load: invalid data format, expected { svg: string, title?: string }",
     });
     expect(toolDefinition.serialize({ svg: "<svg><rect /></svg>" })).toContain(
       '"svg": "<svg><rect /></svg>"',

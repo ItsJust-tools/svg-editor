@@ -10,8 +10,17 @@ const svgExporter: Exporter = {
   export: async (element, options) => {
     const defaultName = `export-${Date.now()}.svg`;
     try {
+      // Prefer an inline rendered <svg> element (preview-style canvases);
+      // otherwise fall back to the editor textarea's raw SVG source, which is
+      // the actual content on the editor tab.
       const svgElement = element.querySelector("svg");
-      if (!svgElement) {
+      const textarea = element.querySelector("textarea");
+      const source = svgElement
+        ? null
+        : textarea instanceof HTMLTextAreaElement
+          ? textarea.value
+          : null;
+      if (!svgElement && !source) {
         return {
           success: false,
           data: null,
@@ -24,23 +33,28 @@ const svgExporter: Exporter = {
         };
       }
 
-      const clone = svgElement.cloneNode(true) as SVGElement;
+      let svgContent: string;
+      if (svgElement) {
+        const clone = svgElement.cloneNode(true) as SVGElement;
 
-      // Ensure xmlns is set
-      if (!clone.getAttribute("xmlns")) {
-        clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        // Ensure xmlns is set
+        if (!clone.getAttribute("xmlns")) {
+          clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        }
+
+        const serializer = new XMLSerializer();
+        svgContent = serializer.serializeToString(clone);
+      } else {
+        svgContent = source ?? "";
       }
-
-      const serializer = new XMLSerializer();
-      const svgContent = serializer.serializeToString(clone);
 
       // Add XML declaration and clean up whitespace
       const declaration = '<?xml version="1.0" encoding="UTF-8"?>';
       const fullContent = `${declaration}\n${svgContent}`;
 
-      const blob = new Blob([fullContent], {
-        type: "image/svg+xml;charset=utf-8",
-      });
+      // Use the exact bare MIME type — the download gate in the core export
+      // engine compares blob.type verbatim against its allowlist.
+      const blob = new Blob([fullContent], { type: "image/svg+xml" });
 
       return {
         success: true,

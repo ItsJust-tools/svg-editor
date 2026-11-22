@@ -51,7 +51,10 @@ test("textarea is editable", async ({ page }) => {
   await expect(textarea).toHaveValue(/fill="red"/);
 
   // Reset
-  await page.getByRole("button", { name: /reset/i }).click();
+  await page
+    .getByRole("button", { name: "Reset", exact: true })
+    .first()
+    .click();
   await expect(textarea).toHaveValue(/>/);
 });
 
@@ -415,14 +418,17 @@ test("state persists across reload", async ({ page }) => {
   await ensureToolbarInteractable(page);
 
   const textarea = page.locator(".svg-editor-textarea");
-  const customSvg = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L100,100" stroke="red"/></svg>';
+  const customSvg =
+    '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L100,100" stroke="red"/></svg>';
   await textarea.fill(customSvg);
 
   // Verify state is changed
   await expect(textarea).toHaveValue(customSvg);
 
-  // Trigger auto-save by waiting briefly
-  await page.waitForTimeout(1000);
+  // Trigger auto-save by waiting for the debounced save to persist
+  await expect(
+    page.locator(".status-slot-state", { hasText: "Saved" }),
+  ).toBeVisible({ timeout: 10000 });
 
   // Reload the page
   await page.reload();
@@ -438,15 +444,17 @@ test("title persists across reload", async ({ page }) => {
   await ensureToolbarInteractable(page);
 
   const customTitle = "My Custom SVG Title";
-  await page.getByRole("button", { name: /brand/i }).click();
-  await page.getByLabel(/brand name/i).fill(customTitle);
-  await page.getByRole("button", { name: /commit/i }).click();
+  await page.getByRole("button", { name: /rename/i }).click();
+  await page.getByLabel(/rename/i).fill(customTitle);
+  await page.getByLabel(/rename/i).press("Enter");
 
   // Verify title is changed
   await expect(page).toHaveTitle(customTitle);
 
-  // Trigger auto-save
-  await page.waitForTimeout(1000);
+  // Trigger auto-save by waiting for the debounced save to persist
+  await expect(
+    page.locator(".status-slot-state", { hasText: "Saved" }),
+  ).toBeVisible({ timeout: 10000 });
 
   // Reload the page
   await page.reload();
@@ -469,7 +477,7 @@ test("undo via keyboard shortcut (Ctrl+Z)", async ({ page }, testInfo) => {
   // Start with a modified SVG to enable undo
   const textarea = page.locator(".svg-editor-textarea");
   await textarea.fill(
-    '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40"/></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40"/></svg>',
   );
 
   const undoButton = page.getByRole("button", { name: "Undo (Ctrl+Z)" });
@@ -498,7 +506,8 @@ test("export SVG payload verification", async ({ page }) => {
   await page.goto("/");
   await ensureToolbarInteractable(page);
 
-  const customSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\\n  <rect x="10" y="10" width="80" height="80" fill="blue"/>\\n  <circle cx="50" cy="50" r="30" fill="yellow"/>\\n</svg>';
+  const customSvg =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\\n  <rect x="10" y="10" width="80" height="80" fill="blue"/>\\n  <circle cx="50" cy="50" r="30" fill="yellow"/>\\n</svg>';
   const textarea = page.locator(".svg-editor-textarea");
   await textarea.fill(customSvg);
 
@@ -514,12 +523,12 @@ test("export SVG payload verification", async ({ page }) => {
 
   // Verify the exported content matches what was in the editor
   const exportedSvg = await page.evaluate(async (path) => {
-    const fs = require('fs');
-    return fs.readFileSync(path, 'utf-8');
+    const fs = await import("fs");
+    return fs.readFileSync(path, "utf-8");
   }, exportPath);
 
   // Normalize both SVGs for comparison (remove extra whitespace)
-  const normalize = (svg) => svg.replace(/\\s+/g, ' ').trim();
+  const normalize = (svg) => svg.replace(/\\s+/g, " ").trim();
   expect(normalize(exportedSvg)).toBe(normalize(customSvg));
 });
 
@@ -527,16 +536,17 @@ test("export JSON payload verification", async ({ page }) => {
   await page.goto("/");
   await ensureToolbarInteractable(page);
 
-  const customSvg = '<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">Test</text></svg>';
+  const customSvg =
+    '<svg xmlns="http://www.w3.org/2000/svg"><text x="10" y="20">Test</text></svg>';
   const customTitle = "Test Export";
-  
+
   const textarea = page.locator(".svg-editor-textarea");
   await textarea.fill(customSvg);
 
   // Set custom title
-  await page.getByRole("button", { name: /brand/i }).click();
-  await page.getByLabel(/brand name/i).fill(customTitle);
-  await page.getByRole("button", { name: /commit/i }).click();
+  await page.getByRole("button", { name: /rename/i }).click();
+  await page.getByLabel(/rename/i).fill(customTitle);
+  await page.getByLabel(/rename/i).press("Enter");
 
   // Grant filesystem permission
   const [download] = await Promise.all([
@@ -550,8 +560,8 @@ test("export JSON payload verification", async ({ page }) => {
 
   // Verify the exported JSON content
   const exportedJson = await page.evaluate(async (path) => {
-    const fs = require('fs');
-    return fs.readFileSync(path, 'utf-8');
+    const fs = await import("fs");
+    return fs.readFileSync(path, "utf-8");
   }, exportPath);
 
   const parsed = JSON.parse(exportedJson);
@@ -564,7 +574,9 @@ test("dark theme persists across reload", async ({ page }) => {
   await page.goto("/");
   await ensureToolbarInteractable(page);
 
-  const themeButton = page.getByRole("button", { name: /Switch to dark mode/i });
+  const themeButton = page.getByRole("button", {
+    name: /Switch to dark mode/i,
+  });
   if (await themeButton.isVisible()) {
     await themeButton.click();
     const html = page.locator("html");
@@ -591,7 +603,9 @@ test("light theme persists across reload", async ({ page }) => {
   const darkButton = page.getByRole("button", { name: /Switch to dark mode/i });
   if (await darkButton.isVisible()) {
     await darkButton.click();
-    const lightButton = page.getByRole("button", { name: /Switch to light mode/i });
+    const lightButton = page.getByRole("button", {
+      name: /Switch to light mode/i,
+    });
     await lightButton.click();
     const html = page.locator("html");
     await expect(html).toHaveAttribute("data-theme", "light");
