@@ -304,9 +304,13 @@ export function useToolState<T>(
     setIsSaving(true);
     try {
       await storage.save(opts.key, data, opts.version);
+      // Persist history BEFORE signalling "Saved" (same ordering as the
+      // autosave path above): the restore path reads the history key, so a
+      // reload racing a saveNow must not observe a marked-saved state with a
+      // stale history payload.
+      await persistHistory();
       setSavedData(data);
       setLastSaved(new Date().toISOString());
-      await persistHistory();
       firstDirtyAtRef.current = null;
     } catch {
       // storage failure is silent by design — caller can observe isDirty

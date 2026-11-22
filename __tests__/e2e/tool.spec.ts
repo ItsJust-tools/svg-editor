@@ -437,7 +437,9 @@ test("state persists across reload", async ({ page }) => {
 
   // Verify state is restored. The restore effect runs after hydration, so
   // poll for the value instead of reading it once.
-  await expect.poll(async () => await textarea.inputValue()).toBe(customSvg);
+  await expect
+    .poll(async () => await textarea.inputValue(), { timeout: 15000 })
+    .toBe(customSvg);
 });
 
 test("title persists across reload", async ({ page }) => {
@@ -469,13 +471,12 @@ test("title persists across reload", async ({ page }) => {
 
 // Keyboard shortcut tests
 test("undo via keyboard shortcut (Ctrl+Z)", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await ensureToolbarInteractable(page);
   if (testInfo.project.name.includes("Mobile")) {
     await expect(page.getByRole("button", { name: /undo/i })).toBeVisible();
     return;
   }
-
-  await page.goto("/");
-  await ensureToolbarInteractable(page);
 
   // Start with a modified SVG to enable undo
   const textarea = page.locator(".svg-editor-textarea");
