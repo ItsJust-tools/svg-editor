@@ -171,9 +171,12 @@ export function useToolState<T>(
       setIsSaving(true);
       try {
         await storage.save(opts.key, data, opts.version);
+        // Persist history BEFORE signalling "Saved": the restore path reads the
+        // history key, so marking saved while a reload could still happen with
+        // the stale history payload would restore the previous state.
+        await persistHistory();
         setSavedData(data);
         setLastSaved(new Date().toISOString());
-        await persistHistory();
         firstDirtyAtRef.current = null;
       } catch (error) {
         if (
