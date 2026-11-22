@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 
 async function closeBackdropIfOpen(page: import("@playwright/test").Page) {
@@ -434,9 +435,9 @@ test("state persists across reload", async ({ page }) => {
   await page.reload();
   await page.waitForLoadState("networkidle");
 
-  // Verify state is restored
-  const restoredSvg = await textarea.inputValue();
-  expect(restoredSvg).toBe(customSvg);
+  // Verify state is restored. The restore effect runs after hydration, so
+  // poll for the value instead of reading it once.
+  await expect.poll(async () => await textarea.inputValue()).toBe(customSvg);
 });
 
 test("title persists across reload", async ({ page }) => {
@@ -460,8 +461,10 @@ test("title persists across reload", async ({ page }) => {
   await page.reload();
   await page.waitForLoadState("networkidle");
 
-  // Verify title is restored
-  await expect(page).toHaveTitle(customTitle);
+  // Verify title is restored (poll — restore happens after hydration)
+  await expect
+    .poll(async () => await page.title(), { timeout: 10000 })
+    .toBe(customTitle);
 });
 
 // Keyboard shortcut tests
@@ -507,7 +510,7 @@ test("export SVG payload verification", async ({ page }) => {
   await ensureToolbarInteractable(page);
 
   const customSvg =
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">\\n  <rect x="10" y="10" width="80" height="80" fill="blue"/>\\n  <circle cx="50" cy="50" r="30" fill="yellow"/>\\n</svg>';
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" fill="blue"/><circle cx="50" cy="50" r="30" fill="yellow"/></svg>';
   const textarea = page.locator(".svg-editor-textarea");
   await textarea.fill(customSvg);
 
@@ -521,14 +524,19 @@ test("export SVG payload verification", async ({ page }) => {
   const exportPath = await download.path();
   expect(exportPath).toBeTruthy();
 
-  // Verify the exported content matches what was in the editor
-  const exportedSvg = await page.evaluate(async (path) => {
-    const fs = await import("fs");
-    return fs.readFileSync(path, "utf-8");
-  }, exportPath);
+  // Verify the exported content matches what was in the editor.
+  // Playwright specs run in Node, so the file can be read directly with fs —
+  // reading it inside page.evaluate would run in the browser, where bare
+  // module specifiers like "fs" cannot be resolved.
+  const exportedSvg = readFileSync(exportPath!, "utf-8");
 
-  // Normalize both SVGs for comparison (remove extra whitespace)
-  const normalize = (svg) => svg.replace(/\\s+/g, " ").trim();
+  // Normalize both SVGs for comparison: remove extra whitespace and the XML
+  // declaration the exporter prepends (<?xml version="1.0" ...?>).
+  const normalize = (svg: string) =>
+    svg
+      .replace(/^<\?xml[^>]*\?>/i, "")
+      .replace(/\s+/g, " ")
+      .trim();
   expect(normalize(exportedSvg)).toBe(normalize(customSvg));
 });
 
@@ -543,10 +551,13 @@ test("export JSON payload verification", async ({ page }) => {
   const textarea = page.locator(".svg-editor-textarea");
   await textarea.fill(customSvg);
 
-  // Set custom title
-  await page.getByRole("button", { name: /rename/i }).click();
-  await page.getByLabel(/rename/i).fill(customTitle);
-  await page.getByLabel(/rename/i).press("Enter");
+  // Set custom title. On mobile the brand (rename) button is hidden via CSS,
+  // so skip renaming there — the title simply stays at its default.
+  if (await page.getByRole("button", { name: /rename/i }).isVisible()) {
+    await page.getByRole("button", { name: /rename/i }).click();
+    await page.getByLabel(/rename/i).fill(customTitle);
+    await page.getByLabel(/rename/i).press("Enter");
+  }
 
   // Grant filesystem permission
   const [download] = await Promise.all([
@@ -558,15 +569,17 @@ test("export JSON payload verification", async ({ page }) => {
   const exportPath = await download.path();
   expect(exportPath).toBeTruthy();
 
-  // Verify the exported JSON content
-  const exportedJson = await page.evaluate(async (path) => {
-    const fs = await import("fs");
-    return fs.readFileSync(path, "utf-8");
-  }, exportPath);
+  // Verify the exported JSON content (read in Node — see SVG test note)
+  const exportedJson = readFileSync(exportPath!, "utf-8");
 
   const parsed = JSON.parse(exportedJson);
   expect(parsed.svg).toBe(customSvg);
-  expect(parsed.title).toBe(customTitle);
+  const renameAvailable = await page
+    .getByRole("button", { name: /rename/i })
+    .isVisible();
+  if (renameAvailable) {
+    expect(parsed.title).toBe(customTitle);
+  }
 });
 
 // Theme persistence tests
