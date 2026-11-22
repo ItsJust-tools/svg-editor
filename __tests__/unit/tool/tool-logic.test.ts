@@ -55,7 +55,7 @@ describe("SVG Editor deserialize", () => {
     const result = toolDefinition.deserialize(null);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toContain("Invalid data");
+      expect(result.error).toContain("Failed to load: invalid data format");
     }
   });
 
@@ -71,7 +71,7 @@ describe("SVG Editor deserialize", () => {
     const result = toolDefinition.deserialize({ count: 42 });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toContain("Invalid data");
+      expect(result.error).toContain("Failed to load: invalid data format");
     }
   });
 
@@ -79,7 +79,7 @@ describe("SVG Editor deserialize", () => {
     const result = toolDefinition.deserialize({ svg: 123 });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toContain("Invalid data");
+      expect(result.error).toContain("Failed to load: invalid data format");
     }
   });
 
@@ -126,7 +126,7 @@ describe("SVG Editor deserialize", () => {
     const result = toolDefinition.deserialize(undefined);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toContain("Invalid data format");
+      expect(result.error).toContain("Failed to load: invalid data format");
     }
   });
 
@@ -134,7 +134,7 @@ describe("SVG Editor deserialize", () => {
     const result = toolDefinition.deserialize(JSON.stringify({ svg: 42 }));
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toContain("Invalid data format");
+      expect(result.error).toContain("Failed to load: invalid data format");
     }
   });
 

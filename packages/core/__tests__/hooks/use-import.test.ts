@@ -28,8 +28,7 @@ describe("useImport", () => {
     );
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromFile>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromFile>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromFile(file);
     });
@@ -51,8 +50,7 @@ describe("useImport", () => {
     const file = createFile("test.png", "binary", "image/png");
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromFile>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromFile>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromFile(file);
     });
@@ -75,8 +73,7 @@ describe("useImport", () => {
     );
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromFile>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromFile>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromFile(file);
     });
@@ -96,8 +93,7 @@ describe("useImport", () => {
     const file = createFile("data.json", JSON.stringify({ foo: "bar" }));
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromFile>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromFile>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromFile(file);
     });
@@ -120,8 +116,7 @@ describe("useImport", () => {
     );
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromFile>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromFile>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromFile(file);
     });
@@ -146,8 +141,7 @@ describe("useImport", () => {
     );
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromFile>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromFile>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromFile(file);
     });
@@ -175,8 +169,7 @@ describe("useImport", () => {
     );
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromFile>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromFile>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromFile(file);
     });
@@ -198,8 +191,7 @@ describe("useImport", () => {
     });
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromFile>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromFile>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromFile(file);
     });
@@ -219,8 +211,7 @@ describe("useImport", () => {
     const file = createFile("data.bin", "binary", "application/octet-stream");
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromFile>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromFile>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromFile(file);
     });
@@ -238,8 +229,7 @@ describe("useImport", () => {
     );
 
     let importResult:
-      | Awaited<ReturnType<typeof result.current.importFromEvent>>
-      | undefined;
+      Awaited<ReturnType<typeof result.current.importFromEvent>> | undefined;
     await act(async () => {
       importResult = await result.current.importFromEvent({
         target: { files: null },

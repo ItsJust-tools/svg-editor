@@ -225,17 +225,35 @@ export function useToolState<T>(
 
   const setData = useCallback(
     (updater: T | ((prev: T) => T)) => {
-      setDataInternal((prev) => {
-        const next =
-          typeof updater === "function"
-            ? (updater as (prev: T) => T)(prev)
-            : updater;
+      // Compute the next value from the current ref state instead of the
+      // functional-updater form. React StrictMode double-invokes updater
+      // functions in development, so performing the history push (a side
+      // effect) inside setDataInternal would run it twice per logical update
+      // and corrupt the undo stack (e.g. undo staying enabled after a single
+      // undo step). All state mutations below are atomic within the event
+      // handler; concurrent updates are not a concern for this UI.
+      // History bookkeeping lives on refs updated synchronously here, NOT as
+      // side effects inside the setState updater: React StrictMode (enabled by
+      // default in Next.js App Router development) double-invokes updater
+      // functions, which would push each value into the undo stack twice and
+      // keep "Undo" enabled after a single step. Reading the head of the
+      // history ref also makes undo/redo-restores idempotent (they set a value
+      // that is already the stack head, so nothing new is pushed).
+      const next =
+        typeof updater === "function"
+          ? (updater as (prev: T) => T)(
+              historyRef.current[historyRef.current.length - 1] as T,
+            )
+          : updater;
+      if (historyRef.current[historyRef.current.length - 1] !== next) {
         historyRef.current = [...historyRef.current, next].slice(-maxHistory);
         futureRef.current = [];
         setCanUndo(historyRef.current.length > 1);
-        setCanRedo(false);
-        return next;
-      });
+      } else {
+        futureRef.current = [];
+      }
+      setCanRedo(false);
+      setDataInternal(next);
     },
     [maxHistory],
   );

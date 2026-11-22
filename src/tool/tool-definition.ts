@@ -5,8 +5,7 @@ import type { SvgEditorState } from "./types";
 
 /** Mirrors the framework's DeserializeResult contract for tool state. */
 type DeserializeResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+  { success: true; data: T } | { success: false; error: string };
 
 /**
  * Type guard that checks whether an unknown value is a valid SvgEditorState.
@@ -33,7 +32,8 @@ function safeDeserialize(data: unknown): DeserializeResult<SvgEditorState> {
     if (!isSvgEditorState(candidate)) {
       return {
         success: false,
-        error: "Invalid data format: expected { svg: string, title?: string }",
+        error:
+          "Failed to load: invalid data format, expected { svg: string, title?: string }",
       };
     }
     return {

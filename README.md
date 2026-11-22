@@ -65,7 +65,7 @@ Open [http://localhost:3000](http://localhost:3000) to start editing SVGs.
 
 ## Project Structure
 
-```
+```text
 src/
 ├── app/                 # Next.js App Router pages
 │   ├── page.tsx             # Main tool page
