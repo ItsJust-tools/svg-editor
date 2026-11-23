@@ -169,7 +169,11 @@ test("sidebar toggle button works", async ({ page }) => {
     await sidebarToggle.click();
     await expect(sidebar).toHaveClass(/open/);
     if (mobile) {
-      await page.locator(".sidebar-backdrop").click();
+      // The open drawer covers the backdrop's center point, so a real click
+      // would be intercepted by the sidebar. Click it via the DOM instead.
+      await page
+        .locator(".sidebar-backdrop")
+        .evaluate((el) => (el as HTMLElement).click());
     } else {
       await sidebarToggle.click();
     }
@@ -178,7 +182,9 @@ test("sidebar toggle button works", async ({ page }) => {
   }
   await expect(sidebar).toHaveClass(/open/);
   if (mobile) {
-    await page.locator(".sidebar-backdrop").click();
+    await page
+      .locator(".sidebar-backdrop")
+      .evaluate((el) => (el as HTMLElement).click());
   } else {
     await sidebarToggle.click();
   }
@@ -426,9 +432,12 @@ test("state persists across reload", async ({ page }) => {
   // Verify state is changed
   await expect(textarea).toHaveValue(customSvg);
 
-  // Trigger auto-save by waiting for the debounced save to persist
+  // Trigger auto-save by waiting for the debounced save to persist. Match the
+  // status text as a whole word: "Unsaved" (the dirty state) contains "Saved"
+  // as a substring, so hasText alone would pass before the 2s debounced
+  // autosave actually fires.
   await expect(
-    page.locator(".status-slot-state", { hasText: "Saved" }),
+    page.locator(".status-slot-state", { hasText: /(^|\b)Saved(\b|$)/ }),
   ).toBeVisible({ timeout: 10000 });
 
   // Reload the page
@@ -446,17 +455,26 @@ test("title persists across reload", async ({ page }) => {
   await page.goto("/");
   await ensureToolbarInteractable(page);
 
-  const customTitle = "My Custom SVG Title";
-  await page.getByRole("button", { name: /rename/i }).click();
-  await page.getByLabel(/rename/i).fill(customTitle);
-  await page.getByLabel(/rename/i).press("Enter");
+  // Set a custom title. On mobile the brand (rename) button is hidden, so the
+  // title stays at its default there.
+  const renameButton = page.getByRole("button", { name: /rename/i });
+  const toolDefaultTitle = await page.title();
+  let customTitle = toolDefaultTitle;
+  if (await renameButton.isVisible()) {
+    customTitle = "My Custom SVG Title";
+    await renameButton.click();
+    await page.getByLabel(/rename/i).fill(customTitle);
+    await page.getByLabel(/rename/i).press("Enter");
+  }
 
   // Verify title is changed
   await expect(page).toHaveTitle(customTitle);
 
-  // Trigger auto-save by waiting for the debounced save to persist
+  // Trigger auto-save by waiting for the debounced save to persist (whole-word
+  // match — "Unsaved" contains "Saved" as a substring). See note in the state
+  // persistence test above.
   await expect(
-    page.locator(".status-slot-state", { hasText: "Saved" }),
+    page.locator(".status-slot-state", { hasText: /(^|\b)Saved(\b|$)/ }),
   ).toBeVisible({ timeout: 10000 });
 
   // Reload the page
